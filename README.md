@@ -5,7 +5,7 @@ django-eventsourcing offers common components that are required for building Eve
 Install with pip:
 
 ```
-pip install django-eventsourcing
+pip install djangoevents
 ```
 
 Include in settings.py:
