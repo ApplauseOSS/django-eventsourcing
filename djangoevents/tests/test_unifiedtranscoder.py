@@ -28,7 +28,7 @@ def test_serialize_and_deserialize_1():
     # test deserialize
     created_copy = transcoder.deserialize(created_stored_event)
     assert 'metadata' not in created_copy.__dict__
-    created.__dict__.pop('metadata')  # metadata is not included in deserialization
+    created.__dict__.pop('metadata', None)  # metadata is not included in deserialization
     assert created.__dict__ == created_copy.__dict__
 
 
@@ -49,6 +49,5 @@ def test_serialize_and_deserialize_2():
     # test deserialize
     updated_copy = transcoder.deserialize(updated_stored_event)
     assert 'metadata' not in updated_copy.__dict__
-    updated.__dict__.pop('metadata') # metadata is not included in deserialization
+    updated.__dict__.pop('metadata', None)  # metadata is not included in deserialization
     assert updated.__dict__ == updated_copy.__dict__
-
