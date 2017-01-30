@@ -29,10 +29,10 @@ class UnifiedTranscoder(AbstractTranscoder):
         assert isinstance(domain_event, DomainEvent)
 
         event_data = domain_event.__dict__.copy()
-        event_data.pop('domain_event_id')
-        event_data.pop('entity_id')
-        event_data.pop('entity_version')
-        event_data.pop('metadata')
+        event_data.pop('domain_event_id', None)
+        event_data.pop('entity_id', None)
+        event_data.pop('entity_version', None)
+        event_data.pop('metadata', None)
 
         domain_event_class = type(domain_event)
 
@@ -119,5 +119,3 @@ class UnifiedTranscoder(AbstractTranscoder):
 
 class ResolveDomainFailed(Exception):
     pass
-
-
