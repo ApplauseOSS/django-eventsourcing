@@ -1,3 +1,4 @@
+import pytest
 from ..unifiedtranscoder import UnifiedTranscoder
 from eventsourcing.domain.model.entity import EventSourcedEntity
 from django.core.serializers.json import DjangoJSONEncoder
@@ -59,4 +60,4 @@ def test_metadata_is_optional():
     try:
         transcoder.serialize(created)
     except AttributeError:
-        assert False, 'Serialization of an event without metadata should not raise an exception.'
+        pytest.fail('Serialization of an event without metadata should not raise an exception.')
