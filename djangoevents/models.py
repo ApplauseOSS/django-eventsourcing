@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Event(models.Model):
-    event_id = models.CharField(max_length=255, db_index=True)
+    event_id = models.CharField(max_length=256, db_index=True)
     event_type = models.CharField(max_length=255)
     event_data = models.TextField()
     aggregate_id = models.CharField(max_length=255, db_index=True)
