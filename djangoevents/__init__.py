@@ -11,6 +11,7 @@ from eventsourcing.domain.model.events import unsubscribe
 from eventsourcing.infrastructure.event_sourced_repo import EventSourcedRepository
 from .domain import BaseEntity
 from .app import EventSourcingWithDjango
+from .schema import validate_event
 from .settings import CONFIG
 
 default_app_config = 'djangoevents.apps.AppConfig'
@@ -45,7 +46,7 @@ def store_event(event, schema=None):
         # TODO: Update to a specific exception
         raise Exception("Schema not provided for event: {}.".format(event))
 
-    if CONFIG.FORCE_VALIDATE_SCHEMA and not hasattr(event, EVENT_SCHEMA_VERSION):
+    if CONFIG.FORCE_VALIDATE_SCHEMA and not hasattr(event, "EVENT_SCHEMA_VERSION"):
         # TODO: Update to a specific exception
         msg = "`EVENT_SCHEMA_VERSION` not set for event {}.".format(event)
         raise Exception(msg)
