@@ -71,7 +71,7 @@ def list_internal_classes(cls, base_class=None):
 
     classes = []
     for elem in inspect.getmembers(cls):
-        if inspect.isclass(elem) and issubclass(elem, base_class):
+        if inspect.isclass(elem):
             classes.append(elem)
 
     return classes
@@ -81,12 +81,17 @@ def list_aggregates():
     """
     Lists all aggregates defined within the application.
     """
-    # `BaseEntity` appendix is just for backward compatibility.
-    return list_subclasses(BaseAggregate) + list_subclasses(BaseEntity)
+    # `BaseEntity` needs to be removed from the list manually (also inherits
+    # from BaseAggregate).
+    aggregates = list_subclasses(BaseAggregate) + list_subclasses(BaseEntity)
+    aggregates = set(aggregates)
+    aggregates.discard(BaseEntity)
+    return list(aggregates)
 
 
 def list_events(aggregate_cls):
     """
     Lists all aggregate_cls events defined within the application.
+    TODO: Does not work, is this approach reliable?
     """
     return list_internal_classes(aggregate_cls, DomainEvent)

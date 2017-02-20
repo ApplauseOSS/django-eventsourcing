@@ -1,6 +1,7 @@
 from django.apps import AppConfig as BaseAppConfig
 from django.conf import settings
 from django.utils.module_loading import import_module
+from .schema import load_all_event_schemas
 import os.path
 
 
@@ -10,6 +11,9 @@ class AppConfig(BaseAppConfig):
     def ready(self):
         for app_module_name in get_app_module_names():
             import_handlers_module(app_module_name)
+
+        # Load all event schemas when installing the Django app
+        load_all_event_schemas()
 
 
 def get_app_module_names():

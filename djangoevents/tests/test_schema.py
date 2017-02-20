@@ -11,3 +11,6 @@ def test_decode_cls_name():
     assert decode_cls_name(LongName) == 'long_name'
     assert decode_cls_name(Shortname) == 'shortname'
 
+
+def test_event_to_schema_path():
+    from ..domain import SampleEvent
