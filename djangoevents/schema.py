@@ -32,6 +32,7 @@ def load_event_schema(aggregate, event):
     """
     * TODO: Is setting up `BASE_DIR` a standard practice for our services? Can we assume this exists?
     * TODO: Event version is not taken into an account.
+    * TODO: should this be called on apps.ready() if validation is enabled?
     """
     avro_dir = CONFIG['EVENT_SCHEMA_VALIDATION']['VALIDATOR_SCHEMA_DIR']
     schema_dir = os.path.join(settings.BASE_DIR, avro_dir)
