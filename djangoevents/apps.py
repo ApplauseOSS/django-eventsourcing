@@ -12,7 +12,8 @@ class AppConfig(BaseAppConfig):
         for app_module_name in get_app_module_names():
             import_handlers_module(app_module_name)
 
-        # Load all event schemas when installing the Django app
+        # Load all event schemas when installing the Django app.
+        # TODO: Django application loading order might be a problem here
         load_all_event_schemas()
 
 
