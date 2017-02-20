@@ -11,6 +11,7 @@ from eventsourcing.domain.model.events import unsubscribe
 from eventsourcing.infrastructure.event_sourced_repo import EventSourcedRepository
 from .domain import BaseEntity
 from .app import EventSourcingWithDjango
+from .settings import CONFIG
 
 default_app_config = 'djangoevents.apps.AppConfig'
 
@@ -35,6 +36,29 @@ def publish(event):
     return es_publish(event)
 
 
-def store_event(event):
+def store_event(event, schema=None):
+    """
+    Store an event to the service's event journal. Optionally validates event
+    schema if one is provided.
+    """
+    if CONFIG.FORCE_VALIDATE_SCHEMA and not schema:
+        # TODO: Update to a specific exception
+        raise Exception("Schema not provided for event: {}.".format(event))
+
+    if CONFIG.FORCE_VALIDATE_SCHEMA and not hasattr(event, EVENT_SCHEMA_VERSION):
+        # TODO: Update to a specific exception
+        msg = "`EVENT_SCHEMA_VERSION` not set for event {}.".format(event)
+        raise Exception(msg)
+
+    if schema:
+        validate_event(event, schema)
+
     return es_publish(event)
 
+
+def validate_event(event, schema):
+    """
+    * https://github.com/datamountaineer/python-serializers
+    * https://github.com/linkedin/python-avro-json-serializer
+    """
+    # TODO: Implement
