@@ -18,5 +18,7 @@ setup(
     install_requires=[
         'eventsourcing>=1.2,<1.3',
         'django',
+        'fastavro==0.12.1',
+        'stringcase==1.0.6',
     ],
 )

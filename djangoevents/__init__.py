@@ -55,11 +55,3 @@ def store_event(event, schema=None):
         validate_event(event, schema)
 
     return es_publish(event)
-
-
-def validate_event(event, schema):
-    """
-    * https://github.com/datamountaineer/python-serializers
-    * https://github.com/linkedin/python-avro-json-serializer
-    """
-    # TODO: Implement

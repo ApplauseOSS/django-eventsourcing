@@ -1,3 +1,4 @@
+import inspect
 import warnings
 
 from eventsourcing.domain.model.entity import DomainEvent
@@ -52,3 +53,40 @@ class BaseEntity(BaseAggregate):
     def mutate(cls, entity=None, event=None):
         warnings.warn("`BaseEntity` is depreciated. Please switch to: `BaseAggregate`", DeprecationWarning)
         return super().mutate(aggregate=entity, event=event)
+
+
+def list_subclasses(cls):
+    """
+    Recursively lists all subclasses of `cls`.
+    TODO: what about `mid level` classes -> do we want them? This can be a bit misleading..
+    """
+    return cls.__subclasses__() + [g for s in cls.__subclasses__() for g in list_subclasses(s)]
+
+
+def list_internal_classes(cls, base_class=None):
+    """
+    List all internal classes of `cls` which are instances of `base_class`.
+    """
+    base_class = base_class or object
+
+    classes = []
+    for elem in inspect.getmembers(cls):
+        if inspect.isclass(elem) and issubclass(elem, base_class):
+            classes.append(elem)
+
+    return classes
+
+
+def list_aggregates():
+    """
+    Lists all aggregates defined within the application.
+    """
+    # `BaseEntity` appendix is just for backward compatibility.
+    return list_subclasses(BaseAggregate) + list_subclasses(BaseEntity)
+
+
+def list_events(aggregate_cls):
+    """
+    Lists all aggregate_cls events defined within the application.
+    """
+    return list_internal_classes(aggregate_cls, DomainEvent)

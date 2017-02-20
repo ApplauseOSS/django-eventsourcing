@@ -1,15 +1,9 @@
-from django.conf import settings
+# from django.conf import settings
 
-
+# This configuration should be overridable on the django.settings level
 CONFIG = {
-    FORCE_VALIDATE_SCHEMA: settings.True
+    'EVENT_SCHEMA_VALIDATION': {
+        'VALIDATOR': 'djangoevents.schema.LocalRepositoryValidator',
+        'VALIDATOR_SCHEMA_DIR': 'avro',
+    },
 }
-
-
-def update_settings():
-    if "DJANGO_EVENTSOURCING" in settings:
-        force_validate = settings.DJANGO_EVENTSOURCING['FORCE_VALIDATE_SCHEMA']
-        CONFIG['FORCE_VALIDATE_SCHEMA'] == force_validate
-
-
-update_settings()
