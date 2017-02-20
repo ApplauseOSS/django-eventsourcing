@@ -43,6 +43,6 @@ def store_event(event):
     schema if one is provided.
     """
     if 'EVENT_SCHEMA_VALIDATION' in CONFIG:
-        validate_event(event, schema)
+        validate_event(event)
 
     return es_publish(event)
