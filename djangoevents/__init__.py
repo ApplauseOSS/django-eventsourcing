@@ -37,21 +37,12 @@ def publish(event):
     return es_publish(event)
 
 
-def store_event(event, schema=None):
+def store_event(event):
     """
     Store an event to the service's event journal. Optionally validates event
     schema if one is provided.
     """
-    if CONFIG.FORCE_VALIDATE_SCHEMA and not schema:
-        # TODO: Update to a specific exception
-        raise Exception("Schema not provided for event: {}.".format(event))
-
-    if CONFIG.FORCE_VALIDATE_SCHEMA and not hasattr(event, "EVENT_SCHEMA_VERSION"):
-        # TODO: Update to a specific exception
-        msg = "`EVENT_SCHEMA_VERSION` not set for event {}.".format(event)
-        raise Exception(msg)
-
-    if schema:
+    if 'EVENT_SCHEMA_VALIDATION' in CONFIG:
         validate_event(event, schema)
 
     return es_publish(event)
