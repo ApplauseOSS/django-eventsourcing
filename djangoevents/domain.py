@@ -88,19 +88,6 @@ def list_subclasses(cls):
     return cls.__subclasses__() + [g for s in cls.__subclasses__() for g in list_subclasses(s)]
 
 
-# def list_internal_classes(cls, base_class=None):
-#     """
-#     List all internal classes of `cls` which are instances of `base_class`.
-#     """
-#     base_class = base_class or object
-#
-#     classes = []
-#     for elem in inspect.getmembers(cls):
-#         if inspect.isclass(elem):
-#             classes.append(elem)
-#
-#     return classes
-
 def list_internal_classes(cls, base_class=None):
     base_class = base_class or object
 
