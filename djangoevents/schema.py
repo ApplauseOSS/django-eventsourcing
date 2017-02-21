@@ -9,7 +9,7 @@ import stringcase
 from collections import defaultdict
 from django.conf import settings
 from .settings import CONFIG
-from .domain import list_aggregates, list_events
+from .domain import list_concrete_aggregates, list_aggregate_events
 
 
 schemas = defaultdict(dict)
@@ -19,8 +19,8 @@ def load_all_event_schemas():
     """
     Initializes aggregate event schemas lookup cache.
     """
-    for aggregate in list_aggregates():
-        for event in list_events(aggregate_cls=aggregate):
+    for aggregate in list_concrete_aggregates():
+        for event in list_aggregate_events(aggregate_cls=aggregate):
             event_spec_path = event_to_schema_path(aggregate, event)
             schemas[event] = load_event_schema(event_spec_path)
 

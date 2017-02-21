@@ -1,4 +1,4 @@
-from ..domain import BaseEntity, DomainEvent, list_events, list_aggregates
+from ..domain import BaseEntity, DomainEvent, list_aggregate_events, list_concrete_aggregates
 
 import pytest
 
@@ -55,13 +55,13 @@ def test_create_for_event():
 
 
 def test_list_aggregates():
-    aggregates = list_aggregates()
+    aggregates = list_concrete_aggregates()
     assert len(aggregates) == 1
     assert aggregates[0] is SampleEntity
 
 
 def test_list_events_sample_event():
-    events = list_events(SampleEntity)
+    events = list_aggregate_events(SampleEntity)
     assert len(events) == 2
     assert set(events) == {
         SampleEntity.Created,

@@ -80,15 +80,14 @@ class BaseEntity(BaseAggregate):
         return super().mutate(aggregate=entity, event=event)
 
 
-def list_subclasses(cls):
+def _list_subclasses(cls):
     """
     Recursively lists all subclasses of `cls`.
-    TODO: what about `mid level` classes -> do we want them? This can be a bit misleading..
     """
-    return cls.__subclasses__() + [g for s in cls.__subclasses__() for g in list_subclasses(s)]
+    return cls.__subclasses__() + [g for s in cls.__subclasses__() for g in _list_subclasses(s)]
 
 
-def list_internal_classes(cls, base_class=None):
+def _list_internal_classes(cls, base_class=None):
     base_class = base_class or object
 
     return [cls_attribute for cls_attribute in cls.__dict__.values()
@@ -96,17 +95,18 @@ def list_internal_classes(cls, base_class=None):
             and issubclass(cls_attribute, base_class)]
 
 
-def list_aggregates():
+def list_concrete_aggregates():
     """
     Lists all non abstract aggregates defined within the application.
     """
-    aggregates = set(list_subclasses(BaseAggregate) + list_subclasses(BaseEntity))
+    aggregates = set(_list_subclasses(BaseAggregate) + _list_subclasses(BaseEntity))
     return [aggregate for aggregate in list(aggregates) if not aggregate.is_abstract_class()]
 
 
-def list_events(aggregate_cls):
+def list_aggregate_events(aggregate_cls):
     """
     Lists all aggregate_cls events defined within the application.
+    Note: Only events with a defined `mutate_event` flow will be returned.
     """
-    events = list_internal_classes(aggregate_cls, DomainEvent)
+    events = _list_internal_classes(aggregate_cls, DomainEvent)
     return [event_cls for event_cls in events if hasattr(event_cls, 'mutate_event')]
