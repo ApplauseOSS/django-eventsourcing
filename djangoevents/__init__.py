@@ -11,7 +11,7 @@ from eventsourcing.domain.model.events import unsubscribe
 from eventsourcing.infrastructure.event_sourced_repo import EventSourcedRepository
 from .domain import BaseEntity
 from .app import EventSourcingWithDjango
-from .schema import validate_event
+from .schema import validate_event, get_event_schema
 from .settings import CONFIG
 
 default_app_config = 'djangoevents.apps.AppConfig'
@@ -43,6 +43,10 @@ def store_event(event):
     schema if one is provided.
     """
     if 'EVENT_SCHEMA_VALIDATION' in CONFIG:
-        validate_event(event)
+        is_valid = validate_event(event)
+        if not is_valid:
+            # TODO: Nicer exception class
+            msg = "Event: {} does not match its schema {}".format(event, get_event_schema(event))
+            raise Exception(msg)
 
     return es_publish(event)

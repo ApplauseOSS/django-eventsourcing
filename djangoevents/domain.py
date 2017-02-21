@@ -1,5 +1,6 @@
 """
 TODO: Document abstract aggregate usage.
+TODO: Disable mutate/create_for_event methods for abstract aggregates?
 """
 
 

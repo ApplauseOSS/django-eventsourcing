@@ -2,10 +2,11 @@
 Aggregate event avro schema validation
 """
 
-import fastavro as avro
+import avro.schema
 import os
 import stringcase
 
+from avro.io import Validate as avro_validate
 from collections import defaultdict
 from django.conf import settings
 from .settings import CONFIG
@@ -22,7 +23,8 @@ def load_all_event_schemas():
     for aggregate in list_concrete_aggregates():
         for event in list_aggregate_events(aggregate_cls=aggregate):
             event_spec_path = event_to_schema_path(aggregate, event)
-            schemas[event] = load_event_schema(event_spec_path)
+            with open(event_spec_path) as fp:
+                schemas[event] = load_event_schema(fp)
 
     return schemas
 
@@ -51,16 +53,15 @@ def decode_cls_name(cls):
     return stringcase.snakecase(cls.__name__)
 
 
-def load_event_schema(spec_path):
-    """
-    """
-    with open(spec_path) as fp:
-        event_spec = avro.reader(fp)
-
-    return event_spec.schema
+def load_event_schema(spec):
+    schema = avro.schema.Parse(spec.read())
+    return schema
 
 
-def validate_event(event):
-    """
-    """
-    return avro.writer.validate(event, schemas[event])
+def get_event_schema(event):
+    return schemas[event]
+
+
+def validate_event(event, schema=None):
+    schema = schema or get_event_schema(event)
+    return avro_validate(schema, event)
