@@ -39,8 +39,8 @@ def event_to_schema_path(aggregate_cls, event_cls):
         # TODO: less generic exception
         raise Exception("`{}.schema_version` must be an integer.".format(event_cls))
 
-    filename = "{aggregate_name}-{event_name}-{version}.json".format(
-        aggregate_name, vent_name=event_name, version=version)
+    filename = "{aggregate_name}_{event_name}_{version}.json".format(
+        aggregate_name=aggregate_name, event_name=event_name, version=version)
 
     avro_dir = CONFIG['EVENT_SCHEMA_VALIDATION']['VALIDATOR_SCHEMA_DIR']
     return os.path.join(settings.BASE_DIR, avro_dir, aggregate_name, filename)

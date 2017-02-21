@@ -32,6 +32,7 @@ def test_base_entity_calls_mutator():
     entity = SampleEntity.mutate(event=close_event, entity=entity)
     assert entity.is_dirty is True
 
+
 def test_base_entity_requires_mutator():
     create_event = SampleEntity.Created(entity_id=1)
     entity = SampleEntity.mutate(event=create_event)

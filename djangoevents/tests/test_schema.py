@@ -2,7 +2,8 @@ import avro.schema
 import json
 import pytest
 from io import StringIO
-from ..schema import decode_cls_name, load_event_schema, validate_event
+from ..schema import decode_cls_name, load_event_schema, validate_event, event_to_schema_path
+from django.test import override_settings
 
 
 SAMPLE_EVENT_SCHEMA = json.dumps({
@@ -72,3 +73,11 @@ def test_validate_valid_event():
 
     ret = validate_event(event, schema)
     assert ret is True
+
+
+@override_settings(BASE_DIR='/path/to/proj/')
+def test_valid_event_to_schema_path():
+    from .test_domain import SampleEntity
+
+    avro_path = event_to_schema_path(aggregate_cls=SampleEntity, event_cls=SampleEntity.Created)
+    assert avro_path == "/path/to/proj/avro/sample_entity/sample_entity_created_1.json"
