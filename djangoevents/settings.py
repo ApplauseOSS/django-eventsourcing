@@ -8,4 +8,6 @@ _DEFAULTS = {
     },
 }
 
+# library user must be able to override the defaults.
+# TODO: settings validation
 CONFIG = getattr(settings, 'EVENTSOURCING', _DEFAULTS)
