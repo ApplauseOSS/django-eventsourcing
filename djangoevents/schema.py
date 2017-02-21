@@ -1,3 +1,7 @@
+"""
+Aggregate event avro schema validation
+"""
+
 import fastavro as avro
 import os
 import stringcase
@@ -50,7 +54,7 @@ def decode_cls_name(cls):
 def load_event_schema(spec_path):
     """
     """
-    with open(event_path) as fp:
+    with open(spec_path) as fp:
         event_spec = avro.reader(fp)
 
     return event_spec.schema

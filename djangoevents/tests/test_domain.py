@@ -60,11 +60,10 @@ def test_list_aggregates():
     assert aggregates[0] is SampleEntity
 
 
-def test_list_events_sampleEve():
+def test_list_events_sample_event():
     events = list_events(SampleEntity)
-    assert len(events) == 3
+    assert len(events) == 2
     assert set(events) == {
         SampleEntity.Created,
         SampleEntity.Updated,
-        SampleEntity.Closed
     }

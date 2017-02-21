@@ -1,8 +1,24 @@
+"""
+TODO: Document abstract aggregate usage.
+"""
+
+
 import inspect
 import warnings
 
 from eventsourcing.domain.model.entity import DomainEvent
 from eventsourcing.domain.model.entity import EventSourcedEntity
+
+
+def abstract(cls):
+    """
+    Marks an aggregate class as abstract.
+
+    Abstract aggregate provides (similarly do Django's abstract Models) means to share implementation
+    details.
+    """
+    cls._abstract = True
+    return cls
 
 
 class BaseAggregate(EventSourcedEntity):
@@ -19,6 +35,12 @@ class BaseAggregate(EventSourcedEntity):
     >>>            instance.connect = True
     >>>            return instance
     """
+    _abstract = False
+
+    @classmethod
+    def is_abstract_class(cls):
+        return cls._abstract or cls is BaseAggregate
+
     @classmethod
     def mutate(cls, aggregate=None, event=None):
         if aggregate:
@@ -48,6 +70,9 @@ class BaseEntity(BaseAggregate):
 
     OBSOLETE! Interface kept for backward compatibility.
     """
+    @classmethod
+    def is_abstract_class(cls):
+        return super().is_abstract_class() or cls is BaseEntity
 
     @classmethod
     def mutate(cls, entity=None, event=None):
@@ -63,35 +88,38 @@ def list_subclasses(cls):
     return cls.__subclasses__() + [g for s in cls.__subclasses__() for g in list_subclasses(s)]
 
 
+# def list_internal_classes(cls, base_class=None):
+#     """
+#     List all internal classes of `cls` which are instances of `base_class`.
+#     """
+#     base_class = base_class or object
+#
+#     classes = []
+#     for elem in inspect.getmembers(cls):
+#         if inspect.isclass(elem):
+#             classes.append(elem)
+#
+#     return classes
+
 def list_internal_classes(cls, base_class=None):
-    """
-    List all internal classes of `cls` which are instances of `base_class`.
-    """
     base_class = base_class or object
 
-    classes = []
-    for elem in inspect.getmembers(cls):
-        if inspect.isclass(elem):
-            classes.append(elem)
-
-    return classes
+    return [cls_attribute for cls_attribute in cls.__dict__.values()
+            if inspect.isclass(cls_attribute)
+            and issubclass(cls_attribute, base_class)]
 
 
 def list_aggregates():
     """
-    Lists all aggregates defined within the application.
+    Lists all non abstract aggregates defined within the application.
     """
-    # `BaseEntity` needs to be removed from the list manually (also inherits
-    # from BaseAggregate).
-    aggregates = list_subclasses(BaseAggregate) + list_subclasses(BaseEntity)
-    aggregates = set(aggregates)
-    aggregates.discard(BaseEntity)
-    return list(aggregates)
+    aggregates = set(list_subclasses(BaseAggregate) + list_subclasses(BaseEntity))
+    return [aggregate for aggregate in list(aggregates) if not aggregate.is_abstract_class()]
 
 
 def list_events(aggregate_cls):
     """
     Lists all aggregate_cls events defined within the application.
-    TODO: Does not work, is this approach reliable?
     """
-    return list_internal_classes(aggregate_cls, DomainEvent)
+    events = list_internal_classes(aggregate_cls, DomainEvent)
+    return [event_cls for event_cls in events if hasattr(event_cls, 'mutate_event')]
