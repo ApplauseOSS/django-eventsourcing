@@ -10,4 +10,4 @@ _DEFAULTS = {
 
 # library user must be able to override the defaults.
 # TODO: settings validation
-CONFIG = getattr(settings, 'EVENTSOURCING', _DEFAULTS)
+CONFIG = getattr(settings, 'DJANGOEVENTS_CONFIG', _DEFAULTS)
