@@ -75,7 +75,7 @@ def test_validate_valid_event():
     assert ret is True
 
 
-@override_settings(BASE_DIR='/path/to/proj/')
+@override_settings(ROOT_DIR='/path/to/proj/')
 def test_valid_event_to_schema_path():
     from .test_domain import SampleEntity
 
