@@ -11,6 +11,7 @@ from collections import defaultdict
 from django.conf import settings
 from .settings import CONFIG
 from .domain import list_concrete_aggregates, list_aggregate_events
+from .exceptions import EventSchemaError
 
 
 schemas = defaultdict(dict)
@@ -22,11 +23,20 @@ def load_all_event_schemas():
     """
     for aggregate in list_concrete_aggregates():
         for event in list_aggregate_events(aggregate_cls=aggregate):
-            event_spec_path = event_to_schema_path(aggregate, event)
-            with open(event_spec_path) as fp:
-                schemas[event] = load_event_schema(fp)
+            schemas[event] = load_event_schema(aggregate, event)
 
     return schemas
+
+
+def load_event_schema(aggregate, event):
+    spec_path = event_to_schema_path(aggregate, event)
+
+    try:
+        with open(spec_path) as fp:
+            return load_event_schema(fp)
+    except FileNotFoundError:
+        msg = "No event schema found for: {event} (expecting file at:{path})."
+        raise EventSchemaError(msg.format(event=event, path=spec_path))
 
 
 def event_to_schema_path(aggregate_cls, event_cls):
@@ -36,8 +46,8 @@ def event_to_schema_path(aggregate_cls, event_cls):
     try:
         version = int(getattr(event_cls, 'schema_version', 1))
     except ValueError:
-        # TODO: less generic exception
-        raise Exception("`{}.schema_version` must be an integer.".format(event_cls))
+        msg = "`{}.schema_version` must be an integer. Currently it is {}"
+        raise EventSchemaError(msg.format(event_cls, event_cls.sche))
 
     filename = "{aggregate_name}_{event_name}_{version}.json".format(
         aggregate_name=aggregate_name, event_name=event_name, version=version)
