@@ -63,7 +63,7 @@ def event_to_schema_path(aggregate_cls, event_cls):
     filename = "{aggregate_name}_{event_name}_{version}.json".format(
         aggregate_name=aggregate_name, event_name=event_name, version=version)
 
-    avro_dir = CONFIG['EVENT_SCHEMA_VALIDATION']['VALIDATOR_SCHEMA_DIR']
+    avro_dir = CONFIG['EVENT_SCHEMA_VALIDATION']['SCHEMA_DIR']
     return os.path.join(settings.ROOT_DIR, avro_dir, aggregate_name, filename)
 
 
