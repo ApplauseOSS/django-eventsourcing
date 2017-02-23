@@ -101,7 +101,7 @@ def list_concrete_aggregates():
     Lists all non abstract aggregates defined within the application.
     """
     aggregates = set(_list_subclasses(BaseAggregate) + _list_subclasses(BaseEntity))
-    return [aggregate for aggregate in list(aggregates) if not aggregate.is_abstract_class()]
+    return [aggregate for aggregate in aggregates if not aggregate.is_abstract_class()]
 
 
 def list_aggregate_events(aggregate_cls):
