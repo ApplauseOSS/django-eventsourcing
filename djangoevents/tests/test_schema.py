@@ -2,7 +2,7 @@ import avro.schema
 import json
 import pytest
 from io import StringIO
-from ..schema import decode_cls_name, load_event_schema, validate_event, event_to_schema_path
+from ..schema import decode_cls_name, parse_event_schema, validate_event, event_to_schema_path
 from django.test import override_settings
 
 
@@ -42,16 +42,16 @@ def test_decode_cls_name():
     assert decode_cls_name(Shortname) == 'shortname'
 
 
-def test_load_invalid_event_schema():
+def test_parse_invalid_event_schema():
     fp = StringIO("Invalid schema")
 
     with pytest.raises(avro.schema.SchemaParseException):
-        load_event_schema(fp)
+        parse_event_schema(fp)
 
 
-def test_load_valid_event_schema():
+def test_parse_valid_event_schema():
     fp = StringIO(SAMPLE_EVENT_SCHEMA)
-    schema = load_event_schema(fp)
+    schema = parse_event_schema(fp)
     assert schema is not None
 
 
