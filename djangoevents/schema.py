@@ -21,9 +21,17 @@ def load_all_event_schemas():
     """
     Initializes aggregate event schemas lookup cache.
     """
+    errors = []
     for aggregate in list_concrete_aggregates():
         for event in list_aggregate_events(aggregate_cls=aggregate):
-            schemas[event] = load_event_schema(aggregate, event)
+            try:
+                schemas[event] = load_event_schema(aggregate, event)
+            except EventSchemaError as e:
+                errors.append(e.message)
+
+    # Serve all schema errors at once not iteratively.
+    if errors:
+        raise EventSchemaError("\n".join(errors))
 
     return schemas
 
@@ -37,6 +45,9 @@ def load_event_schema(aggregate, event):
     except FileNotFoundError:
         msg = "No event schema found for: {event} (expecting file at:{path})."
         raise EventSchemaError(msg.format(event=event, path=spec_path))
+    except avro.schema.SchemaParseException as e:
+        msg = "Can't parse schema for event: {event} from {path}."
+        raise EventSchemaError(msg.format(event=event, path=spec_path)) from e
 
 
 def event_to_schema_path(aggregate_cls, event_cls):
@@ -46,8 +57,8 @@ def event_to_schema_path(aggregate_cls, event_cls):
     try:
         version = int(getattr(event_cls, 'schema_version', 1))
     except ValueError:
-        msg = "`{}.schema_version` must be an integer. Currently it is {}"
-        raise EventSchemaError(msg.format(event_cls, event_cls.sche))
+        msg = "`{}.schema_version` must be an integer. Currently it is {}."
+        raise EventSchemaError(msg.format(event_cls, event_cls.schema_version))
 
     filename = "{aggregate_name}_{event_name}_{version}.json".format(
         aggregate_name=aggregate_name, event_name=event_name, version=version)

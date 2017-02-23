@@ -1,6 +1,7 @@
 from django.apps import AppConfig as BaseAppConfig
 from django.conf import settings
 from django.utils.module_loading import import_module
+from .exceptions import EventSchemaError
 from .schema import load_all_event_schemas
 import os.path
 
@@ -14,7 +15,10 @@ class AppConfig(BaseAppConfig):
 
         # Load all event schemas when installing the Django app.
         # TODO: Django application loading order might be a problem here
-        load_all_event_schemas()
+        try:
+            load_all_event_schemas()
+        except EventSchemaError as e:
+            raise ImproperlyConfigured("Missing event schemas.") from e
 
 
 def get_app_module_names():
