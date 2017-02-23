@@ -1,5 +1,6 @@
 from django.apps import AppConfig as BaseAppConfig
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_module
 from .exceptions import EventSchemaError
 from .schema import load_all_event_schemas
