@@ -34,7 +34,7 @@ __all__ = [
 
 
 def publish(event):
-    warnings.warn("`publish` is depreciated. Please switch to: `store_event`", DeprecationWarning)
+    warnings.warn("`publish` is depreciated. Please switch to: `store_event`.", DeprecationWarning)
     return es_publish(event)
 
 
@@ -46,7 +46,7 @@ def store_event(event):
     if 'EVENT_SCHEMA_VALIDATION' in CONFIG:
         is_valid = validate_event(event)
         if not is_valid:
-            msg = "Event: {} does not match its schema {}".format(event, get_event_schema(event))
+            msg = "Event: {} does not match its schema {}.".format(event, get_event_schema(event))
             raise EventSchemaError(msg)
 
     return es_publish(event)
