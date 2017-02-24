@@ -46,4 +46,4 @@ def load_schemas():
     try:
         load_all_event_schemas()
     except EventSchemaError as e:
-        raise ImproperlyConfigured("Missing event schemas.") from e
+        raise ImproperlyConfigured("Missing or invalid event schemas.") from e
