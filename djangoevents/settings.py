@@ -10,3 +10,7 @@ _DEFAULTS = {
 # library user must be able to override the defaults.
 # TODO: settings validation
 CONFIG = getattr(settings, 'DJANGOEVENTS_CONFIG', _DEFAULTS)
+
+
+def schema_validation_enabled():
+    return CONFIG.get('EVENT_SCHEMA_VALIDATION') is not None

@@ -18,7 +18,7 @@ setup(
     install_requires=[
         'eventsourcing>=1.2,<1.3',
         'django',
-        'avro-python3==1.8.1',
+        'avro-python3==1.7.7',
         'stringcase==1.0.6',
     ],
 )

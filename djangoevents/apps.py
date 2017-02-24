@@ -4,6 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_module
 from .exceptions import EventSchemaError
 from .schema import load_all_event_schemas
+from .settings import schema_validation_enabled
 import os.path
 
 
@@ -14,11 +15,9 @@ class AppConfig(BaseAppConfig):
         for app_module_name in get_app_module_names():
             import_handlers_module(app_module_name)
 
-        # Load all event schemas when installing the Django app.
-        try:
-            load_all_event_schemas()
-        except EventSchemaError as e:
-            raise ImproperlyConfigured("Missing event schemas.") from e
+        # Load all event schemas when installing the Django app
+        if schema_validation_enabled():
+            load_schemas()
 
 
 def get_app_module_names():
@@ -41,3 +40,10 @@ def get_handlers_file_name(app_module_name):
     module = import_module(app_module_name)
     module_dir = os.path.dirname(module.__file__)
     return os.path.join(module_dir, 'handlers.py')
+
+
+def load_schemas():
+    try:
+        load_all_event_schemas()
+    except EventSchemaError as e:
+        raise ImproperlyConfigured("Missing event schemas.") from e

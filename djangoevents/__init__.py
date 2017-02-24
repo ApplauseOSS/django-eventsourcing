@@ -12,8 +12,8 @@ from eventsourcing.infrastructure.event_sourced_repo import EventSourcedReposito
 from .domain import BaseEntity
 from .app import EventSourcingWithDjango
 from .exceptions import EventSchemaError
-from .schema import validate_event, get_event_schema
-from .settings import CONFIG
+from .schema import validate_event
+from .settings import schema_validation_enabled
 
 default_app_config = 'djangoevents.apps.AppConfig'
 
@@ -43,10 +43,10 @@ def store_event(event):
     Store an event to the service's event journal. Optionally validates event
     schema if one is provided.
     """
-    if 'EVENT_SCHEMA_VALIDATION' in CONFIG:
+    if schema_validation_enabled():
         is_valid = validate_event(event)
         if not is_valid:
-            msg = "Event: {} does not match its schema {}.".format(event, get_event_schema(event))
+            msg = "Event: {} does not match its schema.".format(event)
             raise EventSchemaError(msg)
 
     return es_publish(event)
