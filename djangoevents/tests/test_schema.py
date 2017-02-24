@@ -56,21 +56,25 @@ def test_parse_valid_event_schema():
 
 
 def test_validate_invalid_event():
-    schema = avro.schema.Parse(SAMPLE_EVENT_SCHEMA)
-    event = {'test': 'test'}
+    class TestEvent:
+        def __init__(self):
+            self.test = 'test'
 
+    event = TestEvent()
+    schema = avro.schema.Parse(SAMPLE_EVENT_SCHEMA)
     ret = validate_event(event, schema)
     assert ret is False
 
 
 def test_validate_valid_event():
-    schema = avro.schema.Parse(SAMPLE_EVENT_SCHEMA)
-    event = {
-        'schema_version': 1,
-        'project_id': "XYZ",
-        'name': 'Awesome Project'
-    }
+    class TestEvent:
+        def __init__(self):
+            self.schema_version = 1
+            self.project_id = "XYZ"
+            self.name = "Awesome Project"
 
+    event = TestEvent()
+    schema = avro.schema.Parse(SAMPLE_EVENT_SCHEMA)
     ret = validate_event(event, schema)
     assert ret is True
 
@@ -80,4 +84,4 @@ def test_valid_event_to_schema_path():
     from .test_domain import SampleEntity
 
     avro_path = event_to_schema_path(aggregate_cls=SampleEntity, event_cls=SampleEntity.Created)
-    assert avro_path == "/path/to/proj/avro/sample_entity/sample_entity_created_1.json"
+    assert avro_path == "/path/to/proj/avro/sample_entity/sample_entity_created_v1.json"

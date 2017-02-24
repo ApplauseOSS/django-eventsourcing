@@ -14,7 +14,7 @@ from .domain import list_concrete_aggregates, list_aggregate_events
 from .exceptions import EventSchemaError
 
 
-schemas = defaultdict(dict)
+schemas = {}
 
 
 def load_all_event_schemas():
@@ -27,7 +27,7 @@ def load_all_event_schemas():
             try:
                 schemas[event] = load_event_schema(aggregate, event)
             except EventSchemaError as e:
-                errors.append(e.message)
+                errors.append(str(e))
 
     # Serve all schema errors at once not iteratively.
     if errors:
@@ -60,7 +60,7 @@ def event_to_schema_path(aggregate_cls, event_cls):
         msg = "`{}.schema_version` must be an integer. Currently it is {}."
         raise EventSchemaError(msg.format(event_cls, event_cls.schema_version))
 
-    filename = "{aggregate_name}_{event_name}_{version}.json".format(
+    filename = "{aggregate_name}_{event_name}_v{version}.json".format(
         aggregate_name=aggregate_name, event_name=event_name, version=version)
 
     avro_dir = CONFIG['EVENT_SCHEMA_VALIDATION']['SCHEMA_DIR']
@@ -79,10 +79,13 @@ def parse_event_schema(spec):
     return schema
 
 
-def get_event_schema(event):
-    return schemas[event]
+def get_schema_for_event(event_cls):
+    if event_cls not in schemas:
+        raise EventSchemaError("Cached Schema not found for: {}".format(event_cls))
+    return schemas[event_cls]
 
 
 def validate_event(event, schema=None):
-    schema = schema or get_event_schema(event)
-    return avro_validate(schema, event)
+    schema = schema or get_schema_for_event(event.__class__)
+    # TODO: Vars shouldn't be used like that. We need a proper to_dict method
+    return avro_validate(schema, vars(event))
