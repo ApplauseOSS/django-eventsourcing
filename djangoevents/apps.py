@@ -46,4 +46,10 @@ def load_schemas():
     try:
         load_all_event_schemas()
     except EventSchemaError as e:
-        raise ImproperlyConfigured("Missing or invalid event schemas.") from e
+        # TODO: Should we propagate the exception like below and fail any runserver/
+        # management command run if proper schema is not definied? This sounds a bit
+        # drastic. We can simply assume that validate_event_schemas management command
+        # is an integral part of the CI process.
+        # If that is the case maybe this should be logged as warning/error?
+        #raise ImproperlyConfigured("Missing or invalid event schemas.") from e
+        print(e)
