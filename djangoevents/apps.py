@@ -48,4 +48,4 @@ def load_schemas():
     try:
         load_all_event_schemas()
     except EventSchemaError as e:
-        warnings.warn(e, UserWarning)
+        warnings.warn(str(e), UserWarning)
