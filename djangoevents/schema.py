@@ -7,10 +7,9 @@ import os
 import stringcase
 
 from avro.io import Validate as avro_validate
-from collections import defaultdict
 from django.conf import settings
 from .settings import CONFIG
-from .domain import list_concrete_aggregates, list_aggregate_events
+from .utils import list_concrete_aggregates, list_aggregate_events
 from .exceptions import EventSchemaError
 
 

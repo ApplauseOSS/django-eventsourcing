@@ -1,4 +1,5 @@
-from ..domain import BaseEntity, DomainEvent, list_aggregate_events, list_concrete_aggregates
+from ..utils import list_aggregate_events, list_concrete_aggregates
+from ..domain import BaseEntity, DomainEvent
 
 import pytest
 

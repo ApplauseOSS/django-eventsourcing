@@ -1,11 +1,11 @@
 from django.apps import AppConfig as BaseAppConfig
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_module
 from .exceptions import EventSchemaError
 from .schema import load_all_event_schemas
 from .settings import schema_validation_enabled
 import os.path
+import warnings
 
 
 class AppConfig(BaseAppConfig):
@@ -15,7 +15,6 @@ class AppConfig(BaseAppConfig):
         for app_module_name in get_app_module_names():
             import_handlers_module(app_module_name)
 
-        # Load all event schemas when installing the Django app
         if schema_validation_enabled():
             load_schemas()
 
@@ -43,13 +42,10 @@ def get_handlers_file_name(app_module_name):
 
 
 def load_schemas():
+    """
+    Try loading all the event schemas and complain loud if failure occurred.
+    """
     try:
         load_all_event_schemas()
     except EventSchemaError as e:
-        # TODO: Should we propagate the exception like below and fail any runserver/
-        # management command run if proper schema is not definied? This sounds a bit
-        # drastic. We can simply assume that validate_event_schemas management command
-        # is an integral part of the CI process.
-        # If that is the case maybe this should be logged as warning/error?
-        #raise ImproperlyConfigured("Missing or invalid event schemas.") from e
-        print(e)
+        warnings.warn(e, UserWarning)
