@@ -14,7 +14,7 @@ from .domain import BaseAggregate
 from .app import EventSourcingWithDjango
 from .exceptions import EventSchemaError
 from .schema import validate_event
-from .settings import schema_validation_enabled
+from .settings import is_validation_enabled
 
 default_app_config = 'djangoevents.apps.AppConfig'
 
@@ -40,12 +40,14 @@ def publish(event):
     return es_publish(event)
 
 
-def store_event(event):
+def store_event(event, force_validate=False):
     """
     Store an event to the service's event journal. Optionally validates event
     schema if one is provided.
+
+    `force_validate` - enforces event schema validation even if configuration disables it globally.
     """
-    if schema_validation_enabled():
+    if is_validation_enabled() or force_validate:
         is_valid = validate_event(event)
         if not is_valid:
             msg = "Event: {} does not match its schema.".format(event)

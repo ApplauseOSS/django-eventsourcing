@@ -3,7 +3,6 @@ from django.conf import settings
 from django.utils.module_loading import import_module
 from .exceptions import EventSchemaError
 from .schema import load_all_event_schemas
-from .settings import schema_validation_enabled
 import os.path
 import warnings
 
@@ -15,8 +14,7 @@ class AppConfig(BaseAppConfig):
         for app_module_name in get_app_module_names():
             import_handlers_module(app_module_name)
 
-        if schema_validation_enabled():
-            load_schemas()
+        load_schemas()
 
 
 def get_app_module_names():

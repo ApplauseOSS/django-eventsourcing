@@ -115,19 +115,21 @@ from djangoevents import EventSourcedRepository         # from eventsourcing.inf
 
 ### Documenting event schema
 
-Starting from version ` 0.11.dev` event schema validation is enabled by default:
+Event schema validation is disabled by default:
 
-Override `DJANGOEVENTS_CONFIG` configuration in your project settings.py to disable it:
+Override `DJANGOEVENTS_CONFIG` configuration in your project `settings.py` to enable it for the whole project:
 
 ```python
 DJANGOEVENTS_CONFIG = {
     ...
-    'EVENT_SCHEMA_VALIDATION': {},
+    'EVENT_SCHEMA_VALIDATION': {
+        'ENABLED': True,
+        'SCHEMA_DIR': 'avro',
+    },
     ...
 }
 
-```
-
+``` 
 
 **It is expected that each service will fully document all events emitted through avro schema definitions**. Read more about [avro format specification](https://avro.apache.org/docs/1.7.7/spec.html).
 
@@ -149,7 +151,7 @@ Once event schema validation is enabled for your services, following changes wil
   * At startup (`djangoevents.AppConfig.ready()`) schemas of events of all non-abstract aggregates will be loaded, validated & cached. If any error occurs warning message will be printed in the console.
   * `store_event()` will validate your event before storing it to the event journal. 
  
-  
+In cases where enabling validation for the whole project is not possible you can enforce schema validation on-demand by adding `force_valdate=True` parameter to `store_event()` call.
 
 ## Development
 #### Build
