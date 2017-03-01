@@ -2,6 +2,7 @@ import avro.schema
 import json
 import pytest
 from io import StringIO
+
 from ..schema import decode_cls_name, parse_event_schema, validate_event, event_to_schema_path
 from django.test import override_settings
 
@@ -50,8 +51,7 @@ def test_parse_invalid_event_schema():
 
 
 def test_parse_valid_event_schema():
-    fp = StringIO(SAMPLE_EVENT_SCHEMA)
-    schema = parse_event_schema(fp)
+    schema = parse_event_schema(SAMPLE_EVENT_SCHEMA)
     assert schema is not None
 
 

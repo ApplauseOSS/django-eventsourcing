@@ -39,7 +39,7 @@ def load_event_schema(aggregate, event):
 
     try:
         with open(spec_path) as fp:
-            return parse_event_schema(fp)
+            return parse_event_schema(fp.read())
     except FileNotFoundError:
         msg = "No event schema found for: {event} (expecting file at:{path})."
         raise EventSchemaError(msg.format(event=event, path=spec_path))
@@ -72,8 +72,8 @@ def decode_cls_name(cls):
     return stringcase.snakecase(cls.__name__)
 
 
-def parse_event_schema(spec):
-    schema = avro.schema.Parse(spec.read())
+def parse_event_schema(spec_body):
+    schema = avro.schema.Parse(spec_body)
     return schema
 
 
