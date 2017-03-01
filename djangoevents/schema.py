@@ -9,7 +9,7 @@ import stringcase
 from avro.io import Validate as avro_validate
 from django.conf import settings
 from .settings import CONFIG
-from .utils import list_concrete_aggregates, list_aggregate_events
+from .utils import list_concrete_aggregates, list_aggregate_events, event_to_json
 from .exceptions import EventSchemaError
 
 
@@ -87,4 +87,4 @@ def get_schema_for_event(event_cls):
 def validate_event(event, schema=None):
     schema = schema or get_schema_for_event(event.__class__)
     # TODO: Vars shouldn't be used like that. We need a proper to_dict method
-    return avro_validate(schema, vars(event))
+    return avro_validate(schema, event_to_json(event))

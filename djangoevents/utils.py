@@ -32,3 +32,14 @@ def list_aggregate_events(aggregate_cls):
     """
     events = _list_internal_classes(aggregate_cls, DomainEvent)
     return [event_cls for event_cls in events if hasattr(event_cls, 'mutate_event')]
+
+
+def event_to_json(event):
+    """
+    Converts an event class to its dictionary representation.
+    Underlying eventsourcing library does not provide a proper event->dict conversion function.
+
+    Note: Similarly to event journal persistence flow, this method supports native JSON types only.
+    """
+    return vars(event)
+

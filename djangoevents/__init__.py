@@ -10,6 +10,7 @@ from eventsourcing.domain.model.events import subscribe
 from eventsourcing.domain.model.events import unsubscribe
 from eventsourcing.infrastructure.event_sourced_repo import EventSourcedRepository
 from .domain import BaseEntity
+from .domain import BaseAggregate
 from .app import EventSourcingWithDjango
 from .exceptions import EventSchemaError
 from .schema import validate_event
@@ -29,6 +30,7 @@ __all__ = [
     'unsubscribe',
     'subscribe_to',
     'BaseEntity',
+    'BaseAggregate',
     'EventSourcingWithDjango'
 ]
 
