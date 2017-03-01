@@ -129,22 +129,24 @@ DJANGOEVENTS_CONFIG = {
 ```
 
 
-**It is expected that each service will fully document all events emitted to kafka through avro schema definitions**. Read more about [avro format specification](https://avro.apache.org/docs/1.7.7/spec.html).
+**It is expected that each service will fully document all events emitted through avro schema definitions**. Read more about [avro format specification](https://avro.apache.org/docs/1.7.7/spec.html).
 
 By default djangoevents assumes event schemas will be placed in `avro` folder located at project's root directory as specifed below:
 
 ```bash
-$ tree project/avro
+$ tree project
+|- src
+|--- manage.py
+|--- ..
 |-avro
 |--- aggragate_name/
 |----- aggregate_name_test_event1_v1.json
 |----- aggregate_name_test_event2_v1.json
-|- src
 ...
 ```
 
 Once event schema validation is enabled for your services, following changes will apply:
-  * At startup schemas of events of all non-abstract aggregates will be loaded, validated & cached. If any error occurs warning message will be printed in the console.
+  * At startup (`djangoevents.AppConfig.ready()`) schemas of events of all non-abstract aggregates will be loaded, validated & cached. If any error occurs warning message will be printed in the console.
   * `store_event()` will validate your event before storing it to the event journal. 
  
   
