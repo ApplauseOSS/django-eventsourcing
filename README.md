@@ -115,7 +115,7 @@ from djangoevents import EventSourcedRepository         # from eventsourcing.inf
 
 ### Documenting event schema
 
-Event schema validation is disabled by default. To change that override `DJANGOEVENTS_CONFIG` configuration in your project `settings.py` to enable it for the whole project:
+Event schema validation is disabled by default. To enable it for the whole project please add `DJANGOEVENTS_CONFIG` to project's `settings.py`:
 
 ```python
 DJANGOEVENTS_CONFIG = {
