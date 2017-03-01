@@ -1,4 +1,3 @@
-from ..utils import list_aggregate_events, list_concrete_aggregates
 from ..domain import BaseEntity, DomainEvent
 
 import pytest
@@ -54,16 +53,3 @@ def test_create_for_event():
 
     assert obj.id == 'ENTITY_ID'
     assert obj.version == 0
-
-
-def test_list_aggregates():
-    aggregates = list_concrete_aggregates()
-    assert aggregates == [SampleEntity]
-
-
-def test_list_events_sample_event():
-    events = list_aggregate_events(SampleEntity)
-    assert set(events) == {
-        SampleEntity.Created,
-        SampleEntity.Updated,
-    }

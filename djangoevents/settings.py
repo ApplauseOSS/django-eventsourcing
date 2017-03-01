@@ -19,5 +19,5 @@ def is_validation_enabled():
 
 def get_avro_dir():
     avro_folder = CONFIG.get('EVENT_SCHEMA_VALIDATION', {})['SCHEMA_DIR']
-    avro_dir = os.path.join(settings.BASE_DIR, '..', avro_folder)
+    avro_dir = os.path.abspath(os.path.join(settings.BASE_DIR, '..', avro_folder))
     return avro_dir
