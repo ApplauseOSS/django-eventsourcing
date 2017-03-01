@@ -85,5 +85,4 @@ def get_schema_for_event(event_cls):
 
 def validate_event(event, schema=None):
     schema = schema or get_schema_for_event(event.__class__)
-    # TODO: Vars shouldn't be used like that. We need a proper to_dict method
     return avro_validate(schema, event_to_json(event))
