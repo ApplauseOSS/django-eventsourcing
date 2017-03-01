@@ -7,8 +7,7 @@ import os
 import stringcase
 
 from avro.io import Validate as avro_validate
-from django.conf import settings
-from .settings import CONFIG
+from .settings import get_avro_dir
 from .utils import list_concrete_aggregates, list_aggregate_events, event_to_json
 from .exceptions import EventSchemaError
 
@@ -62,8 +61,8 @@ def event_to_schema_path(aggregate_cls, event_cls):
     filename = "{aggregate_name}_{event_name}_v{version}.json".format(
         aggregate_name=aggregate_name, event_name=event_name, version=version)
 
-    avro_dir = CONFIG['EVENT_SCHEMA_VALIDATION']['SCHEMA_DIR']
-    return os.path.join(settings.ROOT_DIR, avro_dir, aggregate_name, filename)
+    avro_dir = get_avro_dir()
+    return os.path.join(avro_dir, aggregate_name, filename)
 
 
 def decode_cls_name(cls):
