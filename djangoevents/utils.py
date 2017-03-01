@@ -2,21 +2,6 @@ import inspect
 from .domain import BaseEntity, BaseAggregate, DomainEvent
 
 
-def _list_subclasses(cls):
-    """
-    Recursively lists all subclasses of `cls`.
-    """
-    return cls.__subclasses__() + [g for s in cls.__subclasses__() for g in _list_subclasses(s)]
-
-
-def _list_internal_classes(cls, base_class=None):
-    base_class = base_class or object
-
-    return [cls_attribute for cls_attribute in cls.__dict__.values()
-            if inspect.isclass(cls_attribute)
-            and issubclass(cls_attribute, base_class)]
-
-
 def list_concrete_aggregates():
     """
     Lists all non abstract aggregates defined within the application.
@@ -42,4 +27,24 @@ def event_to_json(event):
     Note: Similarly to event journal persistence flow, this method supports native JSON types only.
     """
     return vars(event)
+
+
+def _list_subclasses(cls):
+    """
+    Recursively lists all subclasses of `cls`.
+    """
+    subclasses = cls.__subclasses__()
+
+    for subclass in cls.__subclasses__():
+        subclasses += _list_subclasses(subclass)
+
+    return subclasses
+
+
+def _list_internal_classes(cls, base_class=None):
+    base_class = base_class or object
+
+    return [cls_attribute for cls_attribute in cls.__dict__.values()
+            if inspect.isclass(cls_attribute)
+            and issubclass(cls_attribute, base_class)]
 
