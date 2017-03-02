@@ -1,13 +1,15 @@
 import avro.schema
+from djangoevents.exceptions import EventSchemaError
+
 import djangoevents.schema as schema
 import json
 import pytest
 from djangoevents.domain import BaseAggregate
 from djangoevents.domain import DomainEvent
-from .test_domain import SampleEntity
 from io import StringIO
 from django.test import override_settings
 from unittest import mock
+from .test_domain import SampleEntity
 
 
 class Project(BaseAggregate):
@@ -61,22 +63,33 @@ PROJECT_CREATED_SCHEMA = json.dumps({
 })
 
 
+@override_settings(BASE_DIR='/path/to/proj/src/')
 def test_load_all_event_schemas():
-    with mock.patch('djangoevents.schema.list_concrete_aggregates') as la, \
-         mock.patch('djangoevents.schema.list_aggregate_events') as le:
-            la = [SampleEntity]
+    with mock.patch('djangoevents.schema.list_concrete_aggregates') as list_aggs, \
+            mock.patch('djangoevents.schema.load_event_schema') as load_schema:
+        list_aggs.return_value = [Project]
+        schema.load_all_event_schemas()
+
+    load_schema.assert_called_once_with(Project, Project.Created)
 
 
+@override_settings(BASE_DIR='/path/to/proj/src/')
+def test_load_all_event_schemas_missing_specs():
+    with mock.patch('djangoevents.schema.list_concrete_aggregates') as list_aggs:
+        list_aggs.return_value = [Project]
 
-def test_decode_cls_name():
-    class LongName:
-        pass
+        with pytest.raises(EventSchemaError) as e:
+            schema.load_all_event_schemas()
 
-    class Shortname:
-        pass
+    path = "/path/to/proj/avro/project/project_created_v1.json"
+    msg = "No event schema found for: {cls} (expecting file at:{path}).".format(cls=Project.Created, path=path)
+    assert msg in str(e.value)
 
-    assert schema.decode_cls_name(LongName) == 'long_name'
-    assert schema.decode_cls_name(Shortname) == 'shortname'
+
+@override_settings(BASE_DIR='/path/to/proj/src/')
+def test_valid_event_to_schema_path():
+    avro_path = schema.event_to_schema_path(aggregate_cls=SampleEntity, event_cls=SampleEntity.Created)
+    assert avro_path == "/path/to/proj/avro/sample_entity/sample_entity_created_v1.json"
 
 
 def test_parse_invalid_event_schema():
@@ -89,17 +102,6 @@ def test_parse_invalid_event_schema():
 def test_parse_valid_event_schema():
     evt_schema = schema.parse_event_schema(PROJECT_CREATED_SCHEMA)
     assert evt_schema is not None
-
-
-def test_validate_invalid_event():
-    class TestEvent:
-        def __init__(self):
-            self.test = 'test'
-
-    event = TestEvent()
-    evt_schema = avro.schema.Parse(PROJECT_CREATED_SCHEMA)
-    ret = schema.validate_event(event, evt_schema)
-    assert ret is False
 
 
 def test_validate_valid_event():
@@ -116,7 +118,23 @@ def test_validate_valid_event():
     assert ret is True
 
 
-@override_settings(BASE_DIR='/path/to/proj/src/')
-def test_valid_event_to_schema_path():
-    avro_path = schema.event_to_schema_path(aggregate_cls=SampleEntity, event_cls=SampleEntity.Created)
-    assert avro_path == "/path/to/proj/avro/sample_entity/sample_entity_created_v1.json"
+def test_validate_invalid_event():
+    class TestEvent:
+        def __init__(self):
+            self.test = 'test'
+
+    event = TestEvent()
+    evt_schema = avro.schema.Parse(PROJECT_CREATED_SCHEMA)
+    ret = schema.validate_event(event, evt_schema)
+    assert ret is False
+
+
+def test_decode_cls_name():
+    class LongName:
+        pass
+
+    class Shortname:
+        pass
+
+    assert schema.decode_cls_name(LongName) == 'long_name'
+    assert schema.decode_cls_name(Shortname) == 'shortname'

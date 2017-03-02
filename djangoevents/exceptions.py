@@ -6,5 +6,5 @@ class AlreadyExists(DjangoeventsError):
     pass
 
 
-class EventSchemaError(Exception):
+class EventSchemaError(DjangoeventsError):
     pass
