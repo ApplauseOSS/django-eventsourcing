@@ -8,7 +8,9 @@ import stringcase
 
 from avro.io import Validate as avro_validate
 from .settings import get_avro_dir
-from .utils import list_concrete_aggregates, list_aggregate_events, event_to_json
+from .utils import list_concrete_aggregates
+from .utils import list_aggregate_events
+from .utils import event_to_json
 from .exceptions import EventSchemaError
 
 

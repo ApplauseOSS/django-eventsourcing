@@ -1,5 +1,7 @@
 import inspect
-from .domain import BaseEntity, BaseAggregate, DomainEvent
+from .domain import BaseEntity
+from .domain import BaseAggregate
+from .domain import DomainEvent
 
 
 def list_concrete_aggregates():
