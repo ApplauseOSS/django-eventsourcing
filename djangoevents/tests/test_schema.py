@@ -81,7 +81,7 @@ def test_load_all_event_schemas_missing_specs():
         with pytest.raises(EventSchemaError) as e:
             schema.load_all_event_schemas()
 
-    path = "/path/to/proj/avro/project/project_created_v1.json"
+    path = "/path/to/proj/avro/project/v1_project_created.json"
     msg = "No event schema found for: {cls} (expecting file at:{path}).".format(cls=Project.Created, path=path)
     assert msg in str(e.value)
 
@@ -89,7 +89,7 @@ def test_load_all_event_schemas_missing_specs():
 @override_settings(BASE_DIR='/path/to/proj/src/')
 def test_valid_event_to_schema_path():
     avro_path = schema.event_to_schema_path(aggregate_cls=SampleEntity, event_cls=SampleEntity.Created)
-    assert avro_path == "/path/to/proj/avro/sample_entity/sample_entity_created_v1.json"
+    assert avro_path == "/path/to/proj/avro/sample_entity/v1_sample_entity_created.json"
 
 
 def test_parse_invalid_event_schema():

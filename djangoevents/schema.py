@@ -60,7 +60,7 @@ def event_to_schema_path(aggregate_cls, event_cls):
         msg = "`{}.schema_version` must be an integer. Currently it is {}."
         raise EventSchemaError(msg.format(event_cls, event_cls.schema_version))
 
-    filename = "{aggregate_name}_{event_name}_v{version}.json".format(
+    filename = "v{version}_{aggregate_name}_{event_name}.json".format(
         aggregate_name=aggregate_name, event_name=event_name, version=version)
 
     avro_dir = get_avro_dir()
