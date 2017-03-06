@@ -24,7 +24,7 @@ INSTALLED_APPS = [
 djangoevents takes advantage of [eventsourcing](https://github.com/johnbywater/eventsourcing) library for handling event sourcing and replaces its storage backend with Django Model for seamless integration with Django.
 
 ### BaseAggregate
-It is required to place all aggregate definitions in `entities.py` module of a Django application.
+It is required to place all aggregate definitions in `aggregates.py` module of a Django application.
 
 BaseEntity is a wrapper over EventSourcedEntity from eventsourcing's EventSourcedEntity. It is used to define Aggregates, its domain events and how domain events apply changes to Aggregates in one place.
 

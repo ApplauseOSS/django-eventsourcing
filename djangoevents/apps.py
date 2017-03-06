@@ -13,7 +13,7 @@ class AppConfig(BaseAppConfig):
     def ready(self):
         for app_module_name in get_app_module_names():
             import_handlers_module(app_module_name)
-            import_entities_module(app_module_name)
+            import_aggregates_module(app_module_name)
 
         # Once all handlers & aggregates are loaded we can import aggregate schema files.
         # `load_scheas()` assumes that all aggregates are imported at this point.
@@ -28,8 +28,8 @@ def import_handlers_module(app_module_name):
     return import_app_module(app_module_name, 'handlers')
 
 
-def import_entities_module(app_module_name):
-    return import_app_module(app_module_name, 'entities')
+def import_aggregates_module(app_module_name):
+    return import_app_module(app_module_name, 'aggregates')
 
 
 def import_app_module(app_module_name, module_name):
