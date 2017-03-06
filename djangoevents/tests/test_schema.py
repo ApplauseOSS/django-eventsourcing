@@ -64,22 +64,18 @@ PROJECT_CREATED_SCHEMA = json.dumps({
 
 
 @override_settings(BASE_DIR='/path/to/proj/src/')
-def test_load_all_event_schemas():
-    with mock.patch('djangoevents.schema.list_concrete_aggregates') as list_aggs, \
-            mock.patch('djangoevents.schema.load_event_schema') as load_schema:
-        list_aggs.return_value = [Project]
-        schema.load_all_event_schemas()
-
+@mock.patch.object(schema, 'list_concrete_aggregates', return_value=[Project])
+@mock.patch.object(schema, 'load_event_schema')
+def test_load_all_event_schemas(load_schema, load_aggs):
+    schema.load_all_event_schemas()
     load_schema.assert_called_once_with(Project, Project.Created)
 
 
 @override_settings(BASE_DIR='/path/to/proj/src/')
-def test_load_all_event_schemas_missing_specs():
-    with mock.patch('djangoevents.schema.list_concrete_aggregates') as list_aggs:
-        list_aggs.return_value = [Project]
-
-        with pytest.raises(EventSchemaError) as e:
-            schema.load_all_event_schemas()
+@mock.patch.object(schema, 'list_concrete_aggregates', return_value=[Project])
+def test_load_all_event_schemas_missing_specs(list_aggs):
+    with pytest.raises(EventSchemaError) as e:
+        schema.load_all_event_schemas()
 
     path = "/path/to/proj/avro/project/v1_project_created.json"
     msg = "No event schema found for: {cls} (expecting file at:{path}).".format(cls=Project.Created, path=path)

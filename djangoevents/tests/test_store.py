@@ -1,48 +1,38 @@
-from djangoevents import store_event
+import djangoevents
 from unittest import mock
 
 
-def test_store_event_validation_enabled():
+@mock.patch.object(djangoevents, 'is_validation_enabled', return_value=True)
+@mock.patch.object(djangoevents, 'validate_event', return_value=True)
+@mock.patch.object(djangoevents, 'es_publish', return_value=True)
+def test_store_event_validation_enabled(publish, validate_event, validation_enabled):
     evt = {}
-
-    with mock.patch('djangoevents.is_validation_enabled') as validation_enabled, \
-         mock.patch('djangoevents.validate_event') as validate_event, \
-         mock.patch('djangoevents.es_publish') as publish:
-
-        validation_enabled.return_value = True
-        validate_event.return_value = True
-        store_event(evt)
+    djangoevents.store_event(evt)
 
     assert validation_enabled.call_count == 1
-    validate_event.assert_called_once_with(evt)
-    publish.assert_called_once_with(evt)
+    assert validate_event.call_args_list == [mock.call(evt)]
+    assert publish.call_args_list == [mock.call(evt)]
 
 
-def test_store_event_validation_disabled():
+@mock.patch.object(djangoevents, 'is_validation_enabled', return_value=False)
+@mock.patch.object(djangoevents, 'validate_event', return_value=True)
+@mock.patch.object(djangoevents, 'es_publish', return_value=True)
+def test_store_event_validation_disabled(publish, validate_event, validation_enabled):
     evt = {}
-
-    with mock.patch('djangoevents.is_validation_enabled') as validation_enabled, \
-         mock.patch('djangoevents.validate_event') as validate_event, \
-         mock.patch('djangoevents.es_publish') as publish:
-
-        validation_enabled.return_value = False
-        store_event(evt)
+    djangoevents.store_event(evt)
 
     assert validation_enabled.call_count == 1
     assert validate_event.call_count == 0
-    publish.assert_called_once_with(evt)
+    assert publish.call_args_list == [mock.call(evt)]
 
 
-def test_store_event_validation_disabled_force():
+@mock.patch.object(djangoevents, 'is_validation_enabled', return_value=False)
+@mock.patch.object(djangoevents, 'validate_event', return_value=True)
+@mock.patch.object(djangoevents, 'es_publish', return_value=True)
+def test_store_event_validation_disabled_force(publish, validate_event, validation_enabled):
     evt = {}
-
-    with mock.patch('djangoevents.is_validation_enabled') as validation_enabled, \
-         mock.patch('djangoevents.validate_event') as validate_event, \
-         mock.patch('djangoevents.es_publish') as publish:
-
-        validation_enabled.return_value = False
-        store_event(evt, force_validate=True)
+    djangoevents.store_event(evt, force_validate=True)
 
     assert validation_enabled.call_count == 1
-    validate_event.assert_called_once_with(evt)
-    publish.assert_called_once_with(evt)
+    assert validate_event.call_args_list == [mock.call(evt)]
+    assert publish.call_args_list == [mock.call(evt)]
