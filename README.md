@@ -24,7 +24,10 @@ INSTALLED_APPS = [
 djangoevents takes advantage of [eventsourcing](https://github.com/johnbywater/eventsourcing) library for handling event sourcing and replaces its storage backend with Django Model for seamless integration with Django.
 
 ### BaseAggregate
+It is required to place all aggregate definitions in `entities.py` module of a Django application.
+
 BaseEntity is a wrapper over EventSourcedEntity from eventsourcing's EventSourcedEntity. It is used to define Aggregates, its domain events and how domain events apply changes to Aggregates in one place.
+
 ```python
 from djangoevents import BaseAggregate
 
@@ -127,7 +130,7 @@ DJANGOEVENTS_CONFIG = {
     ...
 }
 
-``` 
+```
 
 **It is expected that each service will fully document all events emitted through avro schema definitions**. Read more about [avro format specification](https://avro.apache.org/docs/1.7.7/spec.html).
 
@@ -147,8 +150,8 @@ $ tree project
 
 Once event schema validation is enabled for your services, following changes will apply:
   * At startup (`djangoevents.AppConfig.ready()`) schemas of events of all non-abstract aggregates will be loaded, validated & cached. If any error occurs warning message will be printed in the console.
-  * `store_event()` will validate your event before storing it to the event journal. 
- 
+  * `store_event()` will validate your event before storing it to the event journal.
+
 In cases where enabling validation for the whole project is not possible you can enforce schema validation on-demand by adding `force_valdate=True` parameter to `store_event()` call.
 
 ## Development
