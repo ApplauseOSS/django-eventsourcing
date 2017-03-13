@@ -60,4 +60,4 @@ def camel_case_to_snake_case(text):
             sep = '_%s' % sep
         return sep
 
-    return re.sub(r'[A-Z]', repl, text)
+    return re.sub(r'[A-Z][a-z]', repl, text).lower()
