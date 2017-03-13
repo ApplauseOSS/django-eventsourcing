@@ -1,3 +1,4 @@
+from .utils import camel_case_to_snake_case
 from collections import namedtuple
 from datetime import datetime
 from eventsourcing.domain.services.transcoding import AbstractTranscoder
@@ -10,7 +11,6 @@ from eventsourcing.utils.time import timestamp_from_uuid
 import importlib
 from inspect import isclass
 import json
-import re
 
 UnifiedStoredEvent = namedtuple('StoredEvent',
                                 ['event_id', 'event_type', 'event_data', 'aggregate_id', 'aggregate_type',
@@ -131,14 +131,3 @@ def get_event_type(domain_event):
         event_name = domain_event.__class__.__name__
         event_type_name = '%s%s' % (aggregate_type, event_name)
         return camel_case_to_snake_case(event_type_name)
-
-
-def camel_case_to_snake_case(text):
-
-    def repl(match):
-        sep = match.group().lower()
-        if match.start() > 0:
-            sep = '_%s' % sep
-        return sep
-
-    return re.sub(r'[A-Z]', repl, text)
