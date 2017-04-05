@@ -1,9 +1,8 @@
 from django.apps import AppConfig as BaseAppConfig
 from django.conf import settings
-from django.utils.module_loading import import_module
+from django.utils.module_loading import autodiscover_modules
 from .exceptions import EventSchemaError
 from .schema import load_all_event_schemas
-import os.path
 import warnings
 
 
@@ -11,9 +10,8 @@ class AppConfig(BaseAppConfig):
     name = 'djangoevents'
 
     def ready(self):
-        for app_module_name in get_app_module_names():
-            import_handlers_module(app_module_name)
-            import_aggregates_module(app_module_name)
+        autodiscover_modules('handlers')
+        autodiscover_modules('aggregates')
 
         # Once all handlers & aggregates are loaded we can import aggregate schema files.
         # `load_scheas()` assumes that all aggregates are imported at this point.
@@ -22,31 +20,6 @@ class AppConfig(BaseAppConfig):
 
 def get_app_module_names():
     return settings.INSTALLED_APPS
-
-
-def import_handlers_module(app_module_name):
-    return import_app_module(app_module_name, 'handlers')
-
-
-def import_aggregates_module(app_module_name):
-    return import_app_module(app_module_name, 'aggregates')
-
-
-def import_app_module(app_module_name, module_name):
-    full_module_name = '%s.%s' % (app_module_name, module_name)
-    try:
-        import_module(full_module_name)
-    except ImportError:
-        # we need to re-raise exception in case there was import error inside
-        # `module_name` module
-        module_file_name = get_module_file_name(app_module_name, module_name)
-        if os.path.exists(module_file_name):
-            raise
-
-def get_module_file_name(app_module_name, module_name):
-    module = import_module(app_module_name)
-    module_dir = os.path.dirname(module.__file__)
-    return os.path.join(module_dir, '%s.py' % module_name)
 
 
 def load_schemas():
