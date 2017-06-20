@@ -30,9 +30,8 @@ class Project(BaseAggregate):
         # no mutate_event
         pass
 
-    def __init__(self, schema_version, project_id, name, **kwargs):
+    def __init__(self, project_id, name, **kwargs):
         super().__init__(**kwargs)
-        self.schema_version = schema_version
         self.project_id = project_id
         self.name = name
 

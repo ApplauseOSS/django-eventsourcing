@@ -1,3 +1,9 @@
+0.13.0dev
+======
+
+- Renamed `Event.schema_version` to `Event.version`.
+
+
 0.12.0
 ======
 

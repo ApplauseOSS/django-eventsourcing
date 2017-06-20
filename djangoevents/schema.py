@@ -56,7 +56,7 @@ def event_to_schema_path(aggregate_cls, event_cls, avro_dir=None):
         return _event_to_schema_path(aggregate_cls, event_cls, avro_dir, version)
 
     avro_dir = avro_dir or get_avro_dir()
-    version = _get_schema_version(event_cls)
+    version = _get_event_version(event_cls)
 
     if version:
         return make_path(version)
@@ -75,8 +75,8 @@ def event_to_schema_path(aggregate_cls, event_cls, avro_dir=None):
         return path
 
 
-def _get_schema_version(event_cls):
-    version = getattr(event_cls, 'schema_version', None)
+def _get_event_version(event_cls):
+    version = getattr(event_cls, 'version', None)
 
     if version is None:
         return None
@@ -84,8 +84,8 @@ def _get_schema_version(event_cls):
         try:
             return int(version)
         except ValueError:
-            msg = "`{}.schema_version` must be an integer. Currently it is {}."
-            raise EventSchemaError(msg.format(event_cls, event_cls.schema_version))
+            msg = "`{}.version` must be an integer. Currently it is {}."
+            raise EventSchemaError(msg.format(event_cls, version))
 
 
 def _event_to_schema_path(aggregate_cls, event_cls, avro_dir, version):
