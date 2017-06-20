@@ -37,7 +37,16 @@ def load_all_event_schemas():
     return schemas
 
 
+def set_event_version(aggregate_cls, event_cls, avro_dir=None):
+    avro_dir = avro_dir or get_avro_dir()
+    event_cls.version = \
+        _read_event_version(event_cls) or \
+        _find_highest_event_version_based_on_schemas(aggregate_cls, event_cls, avro_dir) or \
+        1
+
+
 def load_event_schema(aggregate, event):
+    set_event_version(aggregate, event)
     spec_path = event_to_schema_path(aggregate, event)
 
     try:
@@ -52,30 +61,12 @@ def load_event_schema(aggregate, event):
 
 
 def event_to_schema_path(aggregate_cls, event_cls, avro_dir=None):
-    def make_path(version):
-        return _event_to_schema_path(aggregate_cls, event_cls, avro_dir, version)
-
     avro_dir = avro_dir or get_avro_dir()
-    version = _get_event_version(event_cls)
-
-    if version:
-        return make_path(version)
-    else:
-        # use 1 as the default version
-        path = make_path(1)
-
-        # look for schemas on disk and choose the one with the highest version
-        for version in itertools.count(2):
-            potential_path = make_path(version)
-            if os.path.exists(potential_path):
-                path = potential_path
-            else:
-                break
-
-        return path
+    version = _read_event_version(event_cls) or 1
+    return _event_to_schema_path(aggregate_cls, event_cls, avro_dir, version)
 
 
-def _get_event_version(event_cls):
+def _read_event_version(event_cls):
     version = getattr(event_cls, 'version', None)
 
     if version is None:
@@ -86,6 +77,18 @@ def _get_event_version(event_cls):
         except ValueError:
             msg = "`{}.version` must be an integer. Currently it is {}."
             raise EventSchemaError(msg.format(event_cls, version))
+
+
+def _find_highest_event_version_based_on_schemas(aggregate_cls, event_cls, avro_dir):
+    version = None
+    for version_candidate in itertools.count(1):
+        schema_path = _event_to_schema_path(aggregate_cls, event_cls, avro_dir, version_candidate)
+        if os.path.exists(schema_path):
+            version = version_candidate
+        else:
+            break
+
+    return version
 
 
 def _event_to_schema_path(aggregate_cls, event_cls, avro_dir, version):

@@ -2,6 +2,7 @@
 ======
 
 - Renamed `Event.schema_version` to `Event.version`.
+- Started setting `Event.version` based on schema file with the highest number.
 
 
 0.12.0

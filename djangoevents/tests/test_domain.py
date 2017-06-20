@@ -1,6 +1,11 @@
 from ..domain import BaseEntity, DomainEvent
+from ..schema import set_event_version
+from django.test import override_settings
 
+import os
 import pytest
+import shutil
+import tempfile
 
 
 class SampleEntity(BaseEntity):
@@ -53,3 +58,33 @@ def test_create_for_event():
 
     assert obj.id == 'ENTITY_ID'
     assert obj.version == 0
+
+
+@override_settings(BASE_DIR='/path/to/proj/src/')
+def test_version_1():
+    SampleEntity.Created.version = None
+    set_event_version(SampleEntity, SampleEntity.Created)
+    assert SampleEntity.Created.version == 1
+
+
+def test_version_4():
+    try:
+        # make temporary directory structure
+        temp_dir = tempfile.mkdtemp()
+        entity_dir = os.path.join(temp_dir, 'sample_entity')
+        os.mkdir(entity_dir)
+
+        for version in range(1, 4):
+            # make empty schema file
+            expected_schema_path = os.path.join(entity_dir, 'v{}_sample_entity_created.json'.format(version))
+            with open(expected_schema_path, 'w'):
+                pass
+
+            # refresh version
+            SampleEntity.Created.version = None
+            set_event_version(SampleEntity, SampleEntity.Created, avro_dir=temp_dir)
+
+            assert SampleEntity.Created.version == version
+    finally:
+        # remove temporary directory
+        shutil.rmtree(temp_dir)
