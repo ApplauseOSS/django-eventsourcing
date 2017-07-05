@@ -1,21 +1,32 @@
 from .utils import camel_case_to_snake_case
 from collections import namedtuple
 from datetime import datetime
+from eventsourcing.domain.model.events import DomainEvent
+from eventsourcing.domain.model.events import resolve_attr
 from eventsourcing.domain.services.transcoding import AbstractTranscoder
 from eventsourcing.domain.services.transcoding import ObjectJSONDecoder
 from eventsourcing.domain.services.transcoding import id_prefix_from_event
 from eventsourcing.domain.services.transcoding import make_stored_entity_id
-from eventsourcing.domain.model.events import DomainEvent
-from eventsourcing.domain.model.events import resolve_attr
 from eventsourcing.utils.time import timestamp_from_uuid
-import importlib
 from inspect import isclass
+
+import importlib
 import json
 
-UnifiedStoredEvent = namedtuple('StoredEvent',
-                                ['event_id', 'event_type', 'event_data', 'aggregate_id', 'aggregate_type',
-                                 'aggregate_version', 'create_date', 'metadata', 'module_name', 'class_name',
-                                 'stored_entity_id'])
+
+UnifiedStoredEvent = namedtuple('UnifiedStoredEvent', [
+    'event_id',
+    'event_type',
+    'event_data',
+    'aggregate_id',
+    'aggregate_type',
+    'aggregate_version',
+    'create_date',
+    'metadata',
+    'module_name',
+    'class_name',
+    'stored_entity_id',
+])
 
 
 class UnifiedTranscoder(AbstractTranscoder):
