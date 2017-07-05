@@ -17,6 +17,7 @@ import json
 UnifiedStoredEvent = namedtuple('UnifiedStoredEvent', [
     'event_id',
     'event_type',
+    'event_version',
     'event_data',
     'aggregate_id',
     'aggregate_type',
@@ -52,6 +53,7 @@ class UnifiedTranscoder(AbstractTranscoder):
         return UnifiedStoredEvent(
             event_id=domain_event.domain_event_id,
             event_type=get_event_type(domain_event),
+            event_version=domain_event.__class__.version,
             event_data=self._json_encode(event_data),
             aggregate_id=domain_event.entity_id,
             aggregate_type=get_aggregate_type(domain_event),

@@ -19,6 +19,7 @@ def test_serialize_and_deserialize_1():
                                       metadata={'command_id': 123})
     created_stored_event = transcoder.serialize(created)
     assert created_stored_event.event_type == 'sample_aggregate_created'
+    assert created_stored_event.event_version == 1
     assert created_stored_event.event_data == '{"attr1":"val1","attr2":"val2"}'
     assert created_stored_event.aggregate_id == 'b089a0a6-e0b3-480d-9382-c47f99103b3d'
     assert created_stored_event.aggregate_version == 0
@@ -40,6 +41,7 @@ def test_serialize_and_deserialize_2():
                                       attr2='val2', metadata={'command_id': 123})
     updated_stored_event = transcoder.serialize(updated)
     assert updated_stored_event.event_type == 'overridden_event_type'
+    assert updated_stored_event.event_version == 1
     assert updated_stored_event.event_data == '{"attr1":"val1","attr2":"val2"}'
     assert updated_stored_event.aggregate_id == 'b089a0a6-e0b3-480d-9382-c47f99103b3d'
     assert updated_stored_event.aggregate_version == 10

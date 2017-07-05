@@ -3,6 +3,7 @@
 
 - Renamed `Event.schema_version` to `Event.version`.
 - Started setting `Event.version` based on schema file with the highest number.
+- Added event version to event payload.
 
 
 0.12.0
