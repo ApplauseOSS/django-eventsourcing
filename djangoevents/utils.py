@@ -5,6 +5,29 @@ from .domain import DomainEvent
 import re
 
 
+class classproperty:
+    """
+    Like `@property` but for classes, not instances.
+
+    Example:
+
+        class Foo:
+            bar = 1
+
+            @classproperty
+            def baz(cls):
+                return cls.bar + 1
+
+        print(Foo.baz)
+    """
+
+    def __init__(self, func):
+        self.func = func
+
+    def __get__(self, obj, cls):
+        return self.func(cls)
+
+
 def list_concrete_aggregates():
     """
     Lists all non abstract aggregates defined within the application.

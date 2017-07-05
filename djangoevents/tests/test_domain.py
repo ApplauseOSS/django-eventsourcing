@@ -62,8 +62,6 @@ def test_create_for_event():
 
 @override_settings(BASE_DIR='/path/to/proj/src/')
 def test_version_1():
-    SampleEntity.Created.version = None
-    set_event_version(SampleEntity, SampleEntity.Created)
     assert SampleEntity.Created.version == 1
 
 
@@ -81,7 +79,6 @@ def test_version_4():
                 pass
 
             # refresh version
-            SampleEntity.Created.version = None
             set_event_version(SampleEntity, SampleEntity.Created, avro_dir=temp_dir)
 
             assert SampleEntity.Created.version == version

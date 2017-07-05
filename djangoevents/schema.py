@@ -8,11 +8,21 @@ import os
 import stringcase
 
 from avro.io import Validate as avro_validate
+from eventsourcing.domain.model.events import DomainEvent
 from .settings import get_avro_dir
+from .utils import classproperty
 from .utils import list_concrete_aggregates
 from .utils import list_aggregate_events
 from .utils import event_to_json
 from .exceptions import EventSchemaError
+
+
+# extend `DomainEvent` with `version` getter
+def get_version(cls):
+    return getattr(cls, '_version', None) or 1
+
+
+DomainEvent.version = classproperty(get_version)
 
 
 schemas = {}
@@ -39,10 +49,7 @@ def load_all_event_schemas():
 
 def set_event_version(aggregate_cls, event_cls, avro_dir=None):
     avro_dir = avro_dir or get_avro_dir()
-    event_cls.version = \
-        _read_event_version(event_cls) or \
-        _find_highest_event_version_based_on_schemas(aggregate_cls, event_cls, avro_dir) or \
-        1
+    event_cls._version = _find_highest_event_version_based_on_schemas(aggregate_cls, event_cls, avro_dir)
 
 
 def load_event_schema(aggregate, event):
@@ -62,21 +69,7 @@ def load_event_schema(aggregate, event):
 
 def event_to_schema_path(aggregate_cls, event_cls, avro_dir=None):
     avro_dir = avro_dir or get_avro_dir()
-    version = _read_event_version(event_cls) or 1
-    return _event_to_schema_path(aggregate_cls, event_cls, avro_dir, version)
-
-
-def _read_event_version(event_cls):
-    version = getattr(event_cls, 'version', None)
-
-    if version is None:
-        return None
-    else:
-        try:
-            return int(version)
-        except ValueError:
-            msg = "`{}.version` must be an integer. Currently it is {}."
-            raise EventSchemaError(msg.format(event_cls, version))
+    return _event_to_schema_path(aggregate_cls, event_cls, avro_dir, event_cls.version)
 
 
 def _find_highest_event_version_based_on_schemas(aggregate_cls, event_cls, avro_dir):
