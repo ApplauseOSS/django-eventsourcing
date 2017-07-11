@@ -19,7 +19,7 @@ def list_aggregate_events(aggregate_cls):
     Note: Only events with a defined `mutate_event` flow will be returned.
     """
     events = _list_internal_classes(aggregate_cls, DomainEvent)
-    return [event_cls for event_cls in events if hasattr(event_cls, 'mutate_event')]
+    return [event_cls for event_cls in events if hasattr(event_cls, 'mutate_event') and not event_cls._abstract]
 
 
 def event_to_json(event):
