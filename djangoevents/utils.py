@@ -16,7 +16,7 @@ def list_concrete_aggregates():
 def list_aggregate_events(aggregate_cls):
     """
     Lists all aggregate_cls events defined within the application.
-    Note: Only events with a defined `mutate_event` flow will be returned.
+    Note: Only events with a defined `mutate_event` flow and are not marked as abstract will be returned.
     """
     events = _list_internal_classes(aggregate_cls, DomainEvent)
     return [event_cls for event_cls in events if hasattr(event_cls, 'mutate_event') and not event_cls._abstract]
