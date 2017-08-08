@@ -85,7 +85,6 @@ def test_list_events_sample_event_appart_from_abstract():
             # No mutate_event present
             pass
 
-        # Marked abstract
         @abstract
         class Evt4(DomainEvent):
             def mutate_event(self, *args, **kwargs):
