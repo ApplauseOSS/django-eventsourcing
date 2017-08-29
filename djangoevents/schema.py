@@ -39,11 +39,11 @@ def load_all_event_schemas():
 
 def set_event_version(aggregate_cls, event_cls, avro_dir=None):
     avro_dir = avro_dir or get_avro_dir()
-    event_cls._version = _find_highest_event_version_based_on_schemas(aggregate_cls, event_cls, avro_dir)
+    event_cls.version = _find_highest_event_version_based_on_schemas(aggregate_cls, event_cls, avro_dir)
 
 
 def get_event_version(event_cls):
-    return getattr(event_cls, '_version', None) or 1
+    return getattr(event_cls, 'version', None) or 1
 
 
 def load_event_schema(aggregate, event):

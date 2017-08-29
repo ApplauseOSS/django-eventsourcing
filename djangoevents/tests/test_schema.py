@@ -88,7 +88,7 @@ def test_load_all_event_schemas_missing_specs(list_aggs):
 
 @override_settings(BASE_DIR='/path/to/proj/src/')
 def test_valid_event_to_schema_path():
-    SampleEntity.Created._version = None
+    SampleEntity.Created.version = None
     avro_path = schema.event_to_schema_path(aggregate_cls=SampleEntity, event_cls=SampleEntity.Created)
     assert avro_path == "/path/to/proj/avro/sample_entity/v1_sample_entity_created.json"
 
