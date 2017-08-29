@@ -8,7 +8,7 @@ import os
 import stringcase
 
 from avro.io import Validate as avro_validate
-from eventsourcing.domain.model.events import DomainEvent
+from .domain import DomainEvent
 from .settings import get_avro_dir
 from .utils import classproperty
 from .utils import list_concrete_aggregates

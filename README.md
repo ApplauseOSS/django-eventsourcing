@@ -99,7 +99,7 @@ Note: name of that file is important. There is auto-import mechanism that would 
 functions anywhere you like but you'd need to make sure it's imported somehow.
 
 ### Import shortcuts
-For the ease of use, we have ported commonly used functionality from [eventsourcing](https://github.com/johnbywater/eventsourcing) to the top level of this library.
+We have ported commonly used functionality from [eventsourcing](https://github.com/johnbywater/eventsourcing) to the top level of this library. Please import from `djangoevents` because we might have extended functionality of some classes and functions.
 
 ```python
 from djangoevents import DomainEvent                    # from eventsourcing.domain.model.entity import DomainEvent
