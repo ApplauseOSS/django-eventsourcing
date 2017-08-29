@@ -1,4 +1,5 @@
 from ..domain import BaseEntity, DomainEvent
+from ..schema import get_event_version
 from ..schema import set_event_version
 from django.test import override_settings
 
@@ -62,7 +63,7 @@ def test_create_for_event():
 
 @override_settings(BASE_DIR='/path/to/proj/src/')
 def test_version_1():
-    assert SampleEntity.Created.version == 1
+    assert get_event_version(SampleEntity.Created) == 1
 
 
 def test_version_4():
@@ -81,7 +82,7 @@ def test_version_4():
             # refresh version
             set_event_version(SampleEntity, SampleEntity.Created, avro_dir=temp_dir)
 
-            assert SampleEntity.Created.version == version
+            assert get_event_version(SampleEntity.Created) == version
     finally:
         # remove temporary directory
         shutil.rmtree(temp_dir)
