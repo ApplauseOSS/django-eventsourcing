@@ -32,9 +32,11 @@ UnifiedStoredEvent = namedtuple('UnifiedStoredEvent', [
 
 
 class UnifiedTranscoder(AbstractTranscoder):
-    def __init__(self, json_encoder_cls=None):
+    def __init__(self, json_encoder_cls=None, adds_event_version_to_data=False):
         self.json_encoder_cls = json_encoder_cls
         # encrypt not implemented
+
+        self.adds_event_version_to_data = adds_event_version_to_data
 
     def serialize(self, domain_event):
         """
@@ -49,12 +51,16 @@ class UnifiedTranscoder(AbstractTranscoder):
             'metadata',
         }}
 
+        event_version = get_event_version(domain_event.__class__)
+        if self.adds_event_version_to_data:
+            event_data['schema_version'] = event_version
+
         domain_event_class = type(domain_event)
 
         return UnifiedStoredEvent(
             event_id=domain_event.domain_event_id,
             event_type=get_event_type(domain_event),
-            event_version=get_event_version(domain_event.__class__),
+            event_version=event_version,
             event_data=self._json_encode(event_data),
             aggregate_id=domain_event.entity_id,
             aggregate_type=get_aggregate_type(domain_event),

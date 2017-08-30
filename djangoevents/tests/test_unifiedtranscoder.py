@@ -55,6 +55,14 @@ def test_serialize_and_deserialize_2():
     updated.__dict__.pop('metadata') # metadata is not included in deserialization
     assert updated.__dict__ == updated_copy.__dict__
 
+
+def test_serializer_can_add_event_version_to_data():
+    transcoder = UnifiedTranscoder(json_encoder_cls=DjangoJSONEncoder, adds_event_version_to_data=True)
+    event = SampleAggregate.Created(entity_id='b089a0a6-e0b3-480d-9382-c47f99103b3d', attr1='val1', attr2='val2')
+    serialized_event = transcoder.serialize(event)
+    assert serialized_event.event_data == '{"attr1":"val1","attr2":"val2","schema_version":1}'
+
+
 def test_metadata_is_optional():
     transcoder = UnifiedTranscoder(json_encoder_cls=DjangoJSONEncoder)
     created = SampleAggregate.Created(entity_id='b089a0a6-e0b3-480d-9382-c47f99103b3d')
