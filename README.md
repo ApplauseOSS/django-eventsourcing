@@ -129,8 +129,8 @@ DJANGOEVENTS_CONFIG = {
     },
     ...
 }
-
 ```
+
 Once this is enabled avro schema definition will be required for all events in the system.
 The only exception to this rule are events of abstract aggregates:
 
@@ -206,6 +206,24 @@ Once event schema validation is enabled for your services, following changes wil
   * `store_event()` will validate your event before storing it to the event journal.
 
 In cases where enabling validation for the whole project is not possible you can enforce schema validation on-demand by adding `force_valdate=True` parameter to `store_event()` call.
+
+
+### Event version
+
+`djangoevents` detects the latest version of your event based on Avro schema files it finds. Version is stored as the `.version` property of an event *class*, e.g. `SomeEvent.version`. Version is added to stored event envelope under the `event_version` key.
+
+For compatibility with some systems, we provide an option to add event version to event data as well (essentially `stored_event.event_data['schema_version'] = stored_event.event_version`). This functionality is disabled by default, but you can enable it in your project's settings:
+
+```python
+DJANGOEVENTS_CONFIG = {
+    ...
+    'EVENT_TRANSCODER': {
+        'ADDS_EVENT_VERSION_TO_DATA': True,
+    },
+    ...
+}
+```
+
 
 ## Development
 #### Build

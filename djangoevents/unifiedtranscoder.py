@@ -1,3 +1,4 @@
+from . import settings
 from .domain import DomainEvent
 from .schema import get_event_version
 from .utils import camel_case_to_snake_case
@@ -32,9 +33,13 @@ UnifiedStoredEvent = namedtuple('UnifiedStoredEvent', [
 
 
 class UnifiedTranscoder(AbstractTranscoder):
-    def __init__(self, json_encoder_cls=None, adds_event_version_to_data=False):
+    def __init__(self, json_encoder_cls=None, adds_event_version_to_data=None):
         self.json_encoder_cls = json_encoder_cls
         # encrypt not implemented
+
+        # get default from settings
+        if adds_event_version_to_data is None:
+            adds_event_version_to_data = settings.transcoder_adds_event_version_to_data()
 
         self.adds_event_version_to_data = adds_event_version_to_data
 
