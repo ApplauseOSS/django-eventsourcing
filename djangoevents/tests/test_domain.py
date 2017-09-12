@@ -5,8 +5,6 @@ from django.test import override_settings
 
 import os
 import pytest
-import shutil
-import tempfile
 
 
 class SampleEntity(BaseEntity):
@@ -66,23 +64,19 @@ def test_version_1():
     assert get_event_version(SampleEntity.Created) == 1
 
 
-def test_version_4():
-    try:
-        # make temporary directory structure
-        temp_dir = tempfile.mkdtemp()
-        entity_dir = os.path.join(temp_dir, 'sample_entity')
-        os.mkdir(entity_dir)
+def test_version_4(tmpdir):
+    # make temporary directory structure
+    avro_dir = str(tmpdir.mkdir('avro_dir'))
+    entity_dir = os.path.join(avro_dir, 'sample_entity')
+    os.mkdir(entity_dir)
 
-        for version in range(1, 4):
-            # make empty schema file
-            expected_schema_path = os.path.join(entity_dir, 'v{}_sample_entity_created.json'.format(version))
-            with open(expected_schema_path, 'w'):
-                pass
+    for version in range(1, 4):
+        # make empty schema file
+        expected_schema_path = os.path.join(entity_dir, 'v{}_sample_entity_created.json'.format(version))
+        with open(expected_schema_path, 'w'):
+            pass
 
-            # refresh version
-            set_event_version(SampleEntity, SampleEntity.Created, avro_dir=temp_dir)
+        # refresh version
+        set_event_version(SampleEntity, SampleEntity.Created, avro_dir=avro_dir)
 
-            assert get_event_version(SampleEntity.Created) == version
-    finally:
-        # remove temporary directory
-        shutil.rmtree(temp_dir)
+        assert get_event_version(SampleEntity.Created) == version
