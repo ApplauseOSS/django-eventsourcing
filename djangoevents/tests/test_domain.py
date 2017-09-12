@@ -66,17 +66,16 @@ def test_version_1():
 
 def test_version_4(tmpdir):
     # make temporary directory structure
-    avro_dir = str(tmpdir.mkdir('avro_dir'))
-    entity_dir = os.path.join(avro_dir, 'sample_entity')
-    os.mkdir(entity_dir)
+    avro_dir = tmpdir.mkdir('avro_dir')
+    entity_dir = avro_dir.mkdir('sample_entity')
 
     for version in range(1, 4):
         # make empty schema file
-        expected_schema_path = os.path.join(entity_dir, 'v{}_sample_entity_created.json'.format(version))
+        expected_schema_path = os.path.join(entity_dir.strpath, 'v{}_sample_entity_created.json'.format(version))
         with open(expected_schema_path, 'w'):
             pass
 
         # refresh version
-        set_event_version(SampleEntity, SampleEntity.Created, avro_dir=avro_dir)
+        set_event_version(SampleEntity, SampleEntity.Created, avro_dir=avro_dir.strpath)
 
         assert get_event_version(SampleEntity.Created) == version
