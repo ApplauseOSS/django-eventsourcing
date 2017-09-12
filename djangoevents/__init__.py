@@ -5,6 +5,7 @@ from eventsourcing.domain.model.entity import entity_mutator
 from eventsourcing.domain.model.entity import singledispatch
 from eventsourcing.domain.model.decorators import subscribe_to
 from eventsourcing.domain.model.events import publish as es_publish
+from eventsourcing.domain.model.events import subscribe
 from eventsourcing.domain.model.events import unsubscribe
 from eventsourcing.infrastructure.event_sourced_repo import EventSourcedRepository
 from .domain import BaseEntity
