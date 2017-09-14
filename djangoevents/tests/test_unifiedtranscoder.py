@@ -58,7 +58,7 @@ def test_serialize_and_deserialize_2():
 
 
 def test_serializer_can_add_event_version_to_data():
-    transcoder = UnifiedTranscoder(json_encoder_cls=DjangoJSONEncoder, adds_event_version_to_data=True)
+    transcoder = UnifiedTranscoder(json_encoder_cls=DjangoJSONEncoder)
     event = SampleAggregate.Created(entity_id='b089a0a6-e0b3-480d-9382-c47f99103b3d', attr1='val1', attr2='val2')
     serialized_event = transcoder.serialize(event)
     assert serialized_event.event_data == '{"attr1":"val1","attr2":"val2","schema_version":1}'
