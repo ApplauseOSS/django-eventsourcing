@@ -79,3 +79,23 @@ def test_version_4(tmpdir):
         set_event_version(SampleEntity, SampleEntity.Created, avro_dir=avro_dir.strpath)
 
         assert get_event_version(SampleEntity.Created) == version
+
+
+@override_settings(DJANGOEVENTS_CONFIG={
+    'EVENT_TRANSCODER': {
+        'ADDS_EVENT_VERSION_TO_DATA': False,
+    },
+})
+def test_events_dont_have_schema_version_when_disabled():
+    event = SampleEntity.Created(entity_id=1)
+    assert not hasattr(event, 'schema_version')
+
+
+@override_settings(DJANGOEVENTS_CONFIG={
+    'EVENT_TRANSCODER': {
+        'ADDS_EVENT_VERSION_TO_DATA': True,
+    },
+})
+def test_events_have_schema_version_when_enabled():
+    event = SampleEntity.Created(entity_id=1)
+    assert event.schema_version == 1
