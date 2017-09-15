@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils.module_loading import import_module
 from djangoevents import DomainEvent
 from .exceptions import EventSchemaError
-from .settings import transcoder_adds_event_version_to_data
+from .settings import adds_schema_version_to_event_data
 from .schema import get_event_version
 from .schema import load_all_event_schemas
 import os.path
@@ -75,7 +75,7 @@ def patch_domain_event():
     def new_init(self, *args, **kwargs):
         old_init(self, *args, **kwargs)
 
-        if transcoder_adds_event_version_to_data():
+        if adds_schema_version_to_event_data():
             self.__dict__['schema_version'] = get_event_version(cls)
 
     cls.__init__ = new_init

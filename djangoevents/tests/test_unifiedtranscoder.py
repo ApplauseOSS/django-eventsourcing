@@ -58,9 +58,7 @@ def test_serialize_and_deserialize_2():
 
 
 @override_settings(DJANGOEVENTS_CONFIG={
-    'EVENT_TRANSCODER': {
-        'ADDS_EVENT_VERSION_TO_DATA': False,
-    },
+    'ADDS_SCHEMA_VERSION_TO_EVENT_DATA': False,
 })
 def test_serializer_doesnt_include_schema_version_when_its_disabled():
     transcoder = UnifiedTranscoder(json_encoder_cls=DjangoJSONEncoder)
@@ -70,9 +68,7 @@ def test_serializer_doesnt_include_schema_version_when_its_disabled():
 
 
 @override_settings(DJANGOEVENTS_CONFIG={
-    'EVENT_TRANSCODER': {
-        'ADDS_EVENT_VERSION_TO_DATA': True,
-    },
+    'ADDS_SCHEMA_VERSION_TO_EVENT_DATA': True,
 })
 def test_serializer_includes_schema_version_when_its_enabled():
     transcoder = UnifiedTranscoder(json_encoder_cls=DjangoJSONEncoder)

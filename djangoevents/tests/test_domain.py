@@ -82,9 +82,7 @@ def test_version_4(tmpdir):
 
 
 @override_settings(DJANGOEVENTS_CONFIG={
-    'EVENT_TRANSCODER': {
-        'ADDS_EVENT_VERSION_TO_DATA': False,
-    },
+    'ADDS_SCHEMA_VERSION_TO_EVENT_DATA': False,
 })
 def test_events_dont_have_schema_version_when_disabled():
     event = SampleEntity.Created(entity_id=1)
@@ -92,9 +90,7 @@ def test_events_dont_have_schema_version_when_disabled():
 
 
 @override_settings(DJANGOEVENTS_CONFIG={
-    'EVENT_TRANSCODER': {
-        'ADDS_EVENT_VERSION_TO_DATA': True,
-    },
+    'ADDS_SCHEMA_VERSION_TO_EVENT_DATA': True,
 })
 def test_events_have_schema_version_when_enabled():
     event = SampleEntity.Created(entity_id=1)
