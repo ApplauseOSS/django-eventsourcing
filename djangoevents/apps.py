@@ -69,13 +69,12 @@ def patch_domain_event():
     Patch `DomainEvent` to add `schema_version` to event payload.
     """
 
-    cls = DomainEvent
-    old_init = cls.__init__
+    old_init = DomainEvent.__init__
 
     def new_init(self, *args, **kwargs):
         old_init(self, *args, **kwargs)
 
         if adds_schema_version_to_event_data():
-            self.__dict__['schema_version'] = get_event_version(cls)
+            self.__dict__['schema_version'] = get_event_version(self.__class__)
 
-    cls.__init__ = new_init
+    DomainEvent.__init__ = new_init
