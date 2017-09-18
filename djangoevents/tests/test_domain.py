@@ -2,6 +2,7 @@ from ..domain import BaseEntity, DomainEvent
 from ..schema import get_event_version
 from ..schema import set_event_version
 from django.test import override_settings
+from unittest import mock
 
 import os
 import pytest
@@ -105,12 +106,7 @@ def test_events_have_schema_version_when_enabled():
     'ADDS_SCHEMA_VERSION_TO_EVENT_DATA': True,
 })
 def test_events_have_correct_schema_version():
-    original_version = getattr(SampleEntity.Created, 'version', None)
-    expected_version = 666
 
-    try:
-        SampleEntity.Created.version = expected_version
+    with mock.patch.object(SampleEntity.Created, 'version', 666):
         event = SampleEntity.Created(entity_id=1)
-        assert event.schema_version == expected_version
-    finally:
-        SampleEntity.Created.version = original_version
+        assert event.schema_version == 666
