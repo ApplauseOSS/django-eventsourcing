@@ -1,3 +1,10 @@
+0.13.5
+======
+
+- Added index on the `stored_entity_id` field which fixes performance
+  issue when there are many events.
+
+
 0.13.4
 ======
 
