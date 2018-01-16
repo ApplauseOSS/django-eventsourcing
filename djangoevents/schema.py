@@ -3,6 +3,7 @@ Aggregate event avro schema validation
 """
 
 import avro.schema
+import itertools
 import os
 import stringcase
 
@@ -36,7 +37,17 @@ def load_all_event_schemas():
     return schemas
 
 
+def set_event_version(aggregate_cls, event_cls, avro_dir=None):
+    avro_dir = avro_dir or get_avro_dir()
+    event_cls.version = _find_highest_event_version_based_on_schemas(aggregate_cls, event_cls, avro_dir)
+
+
+def get_event_version(event_cls):
+    return getattr(event_cls, 'version', None) or 1
+
+
 def load_event_schema(aggregate, event):
+    set_event_version(aggregate, event)
     spec_path = event_to_schema_path(aggregate, event)
 
     try:
@@ -50,20 +61,31 @@ def load_event_schema(aggregate, event):
         raise EventSchemaError(msg.format(event=event, path=spec_path)) from e
 
 
-def event_to_schema_path(aggregate_cls, event_cls):
+def event_to_schema_path(aggregate_cls, event_cls, avro_dir=None):
+    avro_dir = avro_dir or get_avro_dir()
+    version = get_event_version(event_cls)
+    return _event_to_schema_path(aggregate_cls, event_cls, avro_dir, version)
+
+
+def _find_highest_event_version_based_on_schemas(aggregate_cls, event_cls, avro_dir):
+    version = None
+    for version_candidate in itertools.count(1):
+        schema_path = _event_to_schema_path(aggregate_cls, event_cls, avro_dir, version_candidate)
+        if os.path.exists(schema_path):
+            version = version_candidate
+        else:
+            break
+
+    return version
+
+
+def _event_to_schema_path(aggregate_cls, event_cls, avro_dir, version):
     aggregate_name = decode_cls_name(aggregate_cls)
     event_name = decode_cls_name(event_cls)
-
-    try:
-        version = int(getattr(event_cls, 'schema_version', 1))
-    except ValueError:
-        msg = "`{}.schema_version` must be an integer. Currently it is {}."
-        raise EventSchemaError(msg.format(event_cls, event_cls.schema_version))
 
     filename = "v{version}_{aggregate_name}_{event_name}.json".format(
         aggregate_name=aggregate_name, event_name=event_name, version=version)
 
-    avro_dir = get_avro_dir()
     return os.path.join(avro_dir, aggregate_name, filename)
 
 

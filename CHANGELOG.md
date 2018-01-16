@@ -1,5 +1,62 @@
-0.12
-====
+0.14.0
+======
+
+- Added index on the `stored_entity_id` field which fixes performance
+  issue when there are many events. It requires migration, version
+  change reflects that.
+
+
+0.13.4
+======
+
+- Switched to `schema_version = None` default when deserializing
+  events without `schema_version`.
+
+
+0.13.3
+======
+
+- Stopped overriding `schema_version` if it exists.
+- Started passing all event attributes to event constructor during
+  deserialization. This allows to handle event structure migration
+  ("upcasting") in each event's constructor: one can modify `kwargs`
+  before calling `super().__init__`.
+
+
+0.13.2
+======
+
+- Made `@abstract` non inheritable: now only classes explicitly marked
+  with the `@abstract` decorator are abstract. Their subclasses are not.
+  This was always the intended behavior.
+
+
+0.13.1
+======
+
+- Switched to adding `schema_version` to event objects themselves
+  instead of just transcoded events. This way events will pass
+  validation if their Avro schemas require `schema_version`.
+
+- Renamed setting responsible for the above feature
+  from `EVENT_TRANSCODER.ADDS_EVENT_VERSION_TO_DATA`
+  to `ADDS_SCHEMA_VERSION_TO_EVENT_DATA`.
+
+
+0.13.0
+======
+
+- Renamed `Event.schema_version` to `Event.version`.
+- Started setting `Event.version` based on schema file with the highest number.
+- Added event version to stored event envelope under the `event_version` key.
+- Added setting to add event version to event data as well (see "Event version" section in README).
+
+
+0.12.0
+======
+
+- Started automatically choosing Avro schemas with the highest version
+  (based on file names on disk).
 
 - Changed way how event type string is computed. For example,
   given User aggregate and Created event, now it would be "user_created"

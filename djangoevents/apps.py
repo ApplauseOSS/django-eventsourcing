@@ -1,7 +1,10 @@
 from django.apps import AppConfig as BaseAppConfig
 from django.conf import settings
 from django.utils.module_loading import autodiscover_modules
+from djangoevents import DomainEvent
 from .exceptions import EventSchemaError
+from .settings import adds_schema_version_to_event_data
+from .schema import get_event_version
 from .schema import load_all_event_schemas
 import warnings
 
@@ -10,6 +13,8 @@ class AppConfig(BaseAppConfig):
     name = 'djangoevents'
 
     def ready(self):
+        patch_domain_event()
+
         autodiscover_modules('handlers')
         autodiscover_modules('aggregates')
 
@@ -30,3 +35,22 @@ def load_schemas():
         load_all_event_schemas()
     except EventSchemaError as e:
         warnings.warn(str(e), UserWarning)
+
+
+def patch_domain_event():
+    """
+    Patch `DomainEvent` to add `schema_version` to event payload.
+    """
+
+    old_init = DomainEvent.__init__
+
+    def new_init(self, *args, **kwargs):
+        old_init(self, *args, **kwargs)
+
+        if adds_schema_version_to_event_data():
+            dct = self.__dict__
+            key = 'schema_version'
+            if key not in dct:
+                dct[key] = get_event_version(self.__class__)
+
+    DomainEvent.__init__ = new_init

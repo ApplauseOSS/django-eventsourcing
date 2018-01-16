@@ -1,21 +1,35 @@
+from .domain import DomainEvent
+from .schema import get_event_version
+from .settings import adds_schema_version_to_event_data
 from .utils import camel_case_to_snake_case
 from collections import namedtuple
 from datetime import datetime
+from eventsourcing.domain.model.events import resolve_attr
 from eventsourcing.domain.services.transcoding import AbstractTranscoder
 from eventsourcing.domain.services.transcoding import ObjectJSONDecoder
 from eventsourcing.domain.services.transcoding import id_prefix_from_event
 from eventsourcing.domain.services.transcoding import make_stored_entity_id
-from eventsourcing.domain.model.events import DomainEvent
-from eventsourcing.domain.model.events import resolve_attr
 from eventsourcing.utils.time import timestamp_from_uuid
-import importlib
 from inspect import isclass
+
+import importlib
 import json
 
-UnifiedStoredEvent = namedtuple('StoredEvent',
-                                ['event_id', 'event_type', 'event_data', 'aggregate_id', 'aggregate_type',
-                                 'aggregate_version', 'create_date', 'metadata', 'module_name', 'class_name',
-                                 'stored_entity_id'])
+
+UnifiedStoredEvent = namedtuple('UnifiedStoredEvent', [
+    'event_id',
+    'event_type',
+    'event_version',
+    'event_data',
+    'aggregate_id',
+    'aggregate_type',
+    'aggregate_version',
+    'create_date',
+    'metadata',
+    'module_name',
+    'class_name',
+    'stored_entity_id',
+])
 
 
 class UnifiedTranscoder(AbstractTranscoder):
@@ -37,10 +51,12 @@ class UnifiedTranscoder(AbstractTranscoder):
         }}
 
         domain_event_class = type(domain_event)
+        event_version = get_event_version(domain_event_class)
 
         return UnifiedStoredEvent(
             event_id=domain_event.domain_event_id,
             event_type=get_event_type(domain_event),
+            event_version=event_version,
             event_data=self._json_encode(event_data),
             aggregate_id=domain_event.entity_id,
             aggregate_type=get_aggregate_type(domain_event),
@@ -65,11 +81,19 @@ class UnifiedTranscoder(AbstractTranscoder):
         event_attrs = self._json_decode(stored_event.event_data)
 
         # Reinstantiate and return the domain event object.
+        defaults = {
+            'entity_id': stored_event.aggregate_id,
+            'entity_version': stored_event.aggregate_version,
+            'domain_event_id': stored_event.event_id,
+        }
+
+        if adds_schema_version_to_event_data():
+            defaults['schema_version'] = None
+
+        kwargs = {**defaults, **event_attrs}
+
         try:
-            domain_event = domain_event_class(entity_id=stored_event.aggregate_id,
-                                              entity_version=stored_event.aggregate_version,
-                                              domain_event_id=stored_event.event_id)  # metadata is not needed
-            domain_event.__dict__.update(event_attrs)
+            domain_event = domain_event_class(**kwargs)
         except TypeError:
             raise ValueError("Unable to instantiate class '{}' with data '{}'"
                              "".format(stored_event.class_name, event_attrs))

@@ -3,13 +3,18 @@ from djangoevents.exceptions import EventSchemaError
 
 import djangoevents.schema as schema
 import json
+import os
 import pytest
+import shutil
+import tempfile
+
 from djangoevents.domain import BaseAggregate
 from djangoevents.domain import DomainEvent
 from io import StringIO
 from django.test import override_settings
 from unittest import mock
 from .test_domain import SampleEntity
+from ..schema import set_event_version
 
 
 class Project(BaseAggregate):
@@ -26,9 +31,8 @@ class Project(BaseAggregate):
         # no mutate_event
         pass
 
-    def __init__(self, schema_version, project_id, name, **kwargs):
+    def __init__(self, project_id, name, **kwargs):
         super().__init__(**kwargs)
-        self.schema_version = schema_version
         self.project_id = project_id
         self.name = name
 
@@ -84,8 +88,38 @@ def test_load_all_event_schemas_missing_specs(list_aggs):
 
 @override_settings(BASE_DIR='/path/to/proj/src/')
 def test_valid_event_to_schema_path():
+    SampleEntity.Created.version = None
     avro_path = schema.event_to_schema_path(aggregate_cls=SampleEntity, event_cls=SampleEntity.Created)
     assert avro_path == "/path/to/proj/avro/sample_entity/v1_sample_entity_created.json"
+
+
+@override_settings(BASE_DIR='/path/to/proj/src/')
+def test_event_to_schema_path_chooses_file_with_the_highest_version():
+    try:
+        # make temporary directory structure
+        temp_dir = tempfile.mkdtemp()
+        entity_dir = os.path.join(temp_dir, 'sample_entity')
+        os.mkdir(entity_dir)
+
+        for version in range(1, 4):
+            # make empty schema file
+            expected_schema_path = os.path.join(entity_dir, 'v{}_sample_entity_created.json'.format(version))
+            with open(expected_schema_path, 'w'):
+                pass
+
+            # refresh version
+            set_event_version(SampleEntity, SampleEntity.Created, avro_dir=temp_dir)
+
+            # check path
+            schema_path = schema.event_to_schema_path(
+                aggregate_cls=SampleEntity,
+                event_cls=SampleEntity.Created,
+                avro_dir=temp_dir,
+            )
+            assert schema_path == expected_schema_path
+    finally:
+        # remove temporary directory
+        shutil.rmtree(temp_dir)
 
 
 def test_parse_invalid_event_schema():

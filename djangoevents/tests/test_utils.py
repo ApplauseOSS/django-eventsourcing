@@ -1,6 +1,6 @@
 from djangoevents.domain import BaseAggregate
 from djangoevents.domain import DomainEvent
-from djangoevents.domain import abstract
+from djangoevents.utils_abstract import abstract
 from ..utils import camel_case_to_snake_case
 from ..utils import list_aggregate_events
 from ..utils import list_concrete_aggregates
@@ -71,7 +71,7 @@ def test_list_aggregates_none_present():
         assert aggregates == []
 
 
-def test_list_events_sample_event():
+def test_list_events_sample_event_appart_from_abstract():
     class Aggregate(BaseAggregate):
         class Evt1(DomainEvent):
             def mutate_event(self, *args, **kwargs):
@@ -84,6 +84,11 @@ def test_list_events_sample_event():
         class Evt3(DomainEvent):
             # No mutate_event present
             pass
+
+        @abstract
+        class Evt4(DomainEvent):
+            def mutate_event(self, *args, **kwargs):
+                pass
 
     events = list_aggregate_events(Aggregate)
     assert set(events) == {Aggregate.Evt1, Aggregate.Evt2}
